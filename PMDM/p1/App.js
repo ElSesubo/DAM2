@@ -27,9 +27,8 @@ export default function App() {
   function Articles(){
     const array = [];
     for (let index = 0; index < 4; index++) {
-      array.push(<Article/>)
+      array.push(<Article key={index}/>)
     } 
-    let list;
     return(
       <View>
         <>{array.map(article =>
