@@ -16,9 +16,11 @@ public class ej2_3 {
 	            System.out.print(caracter);
 	            caracterLeido = fileReader.read();
 	            Thread.sleep(speed);
-	            System.out.println("Press Enter to continue");
-	            try{System.in.read();}
-	            catch(Exception e){}
+	            if(caracterLeido == 100) {
+	            	System.out.println("Press Enter to continue");
+		            try{System.in.read();}
+		            catch(Exception e){}
+	            }
 	        }
 	    }catch(IOException ex){
 	        System.err.println("Erorr al leer el archivo");
