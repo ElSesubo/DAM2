@@ -4,6 +4,12 @@ import java.util.Scanner;
 
 public class ej26 {
 	
+	static Integer acuSuspendidos = 0;
+	static Integer acuAprobados = 0;
+	static Integer acuNotables = 0;
+	static Integer acuSobresalientes = 0;
+	static Integer acuMatriculas = 0;
+
 	public static void Nota(Integer nota) {
 		if(nota >= 0 && nota <= 4) {
 			acuSuspendidos++;
@@ -21,11 +27,6 @@ public class ej26 {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Scanner teclado;
-		Integer acuSuspendidos = 0;
-		Integer acuAprobados = 0;
-		Integer acuNotables = 0;
-		Integer acuSobresalientes = 0;
-		Integer acuMatriculas = 0;
 		Integer nota;
 		
 		for(int i = 0; i < 5; i++) {
@@ -41,5 +42,4 @@ public class ej26 {
 		System.out.println("Total sobresalientes: " + acuSobresalientes);
 		System.out.println("Total matriculas: " + acuMatriculas);
 	}
-
 }
