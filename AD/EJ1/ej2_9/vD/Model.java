@@ -16,7 +16,7 @@ public class Model {
 	
 	static int lineasTotales;
     static int totalCoincidencias;
-    static File archivo = new File("C:\\Users\\gabri\\Documents\\DAM2\\ADD\\EJ_T2\\src\\es\\florida\\ejT1\\ej2_9\\document.txt");
+    static File archivo = new File("./sus.txt");
 	
 	public Model() {
 		
@@ -41,8 +41,6 @@ public class Model {
 	public static void buscarPalabra(String palabra) {
 		try {
             if(archivo.exists()) {
-            	lineasTotales = 0;
-            	totalCoincidencias = 0;
                 BufferedReader leerArchivo = new BufferedReader(new FileReader(archivo));
                 String lineaLeida;
                 while((lineaLeida = leerArchivo.readLine()) != null) {
