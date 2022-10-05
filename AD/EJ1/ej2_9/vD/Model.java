@@ -17,13 +17,14 @@ public class Model {
 	static int lineasTotales;
     static int totalCoincidencias;
     static File archivo = new File("./sus.txt");
+    static File archivocopy = new File("./sus_copy.txt");
 	
 	public Model() {
 		
 	}
 	
-	public static String mostrarContenido() {
-		String texto = null;
+	public String mostrarContenido(File archivo) {
+		String texto = "";
 		try(FileReader fileReader = new FileReader(archivo)){
 	        int caracterLeido = fileReader.read();
 	        while(caracterLeido!= -1) {
@@ -38,42 +39,59 @@ public class Model {
 		return texto;
 	}
 	
-	public static void buscarPalabra(String palabra) {
+	public void buscarPalabra(String palabra) {
 		try {
-            if(archivo.exists()) {
-                BufferedReader leerArchivo = new BufferedReader(new FileReader(archivo));
-                String lineaLeida;
-                while((lineaLeida = leerArchivo.readLine()) != null) {
-                    lineasTotales = lineasTotales + 1;
-                    String[] palabras = lineaLeida.split(" ");
-                    for(int i = 0 ; i < palabras.length ; i++) {
-                        if(palabras[i].equals(palabra)) {
-                            totalCoincidencias = totalCoincidencias + 1;
-                        }
-                    }
-                }
-            }
-            JOptionPane.showMessageDialog(null, "En total se encotro la palabra: " + palabra + ", " + totalCoincidencias + " Veces en el archivo");
+			if(palabra.isEmpty()) {
+				JOptionPane.showMessageDialog(null, "El campo de texto está vacío");
+			}else {
+				if(archivo.exists()) {
+	            	lineasTotales = 0;
+	            	totalCoincidencias = 0;
+	                BufferedReader leerArchivo = new BufferedReader(new FileReader(archivo));
+	                String lineaLeida;
+	                while((lineaLeida = leerArchivo.readLine()) != null) {
+	                    lineasTotales = lineasTotales + 1;
+	                    String[] palabras = lineaLeida.split(" ");
+	                    for(int i = 0 ; i < palabras.length ; i++) {
+	                        if(palabras[i].equals(palabra)) {
+	                            totalCoincidencias = totalCoincidencias + 1;
+	                        }
+	                    }
+	                }
+	            }
+	            JOptionPane.showMessageDialog(null, "En total se encotro la palabra: " + palabra + ", " + totalCoincidencias + " Veces en el archivo");
+	            vista.txfBuscar.setText("");
+			}
         } catch(Exception e) {
             System.out.println(e.getMessage());
         }
 	}
 	
-	public static void reemplazarPalabra(String palabra, String reemplazo) {
+	public void reemplazarPalabra(String palabra, String reemplazo) {
 		try {
-			if(archivo.exists()) {
-				BufferedReader leerArchivo = new BufferedReader(new FileReader(archivo));
-                String lineaLeida;
-                FileWriter fw = new FileWriter(archivo);
-    			BufferedWriter bw = new BufferedWriter(fw);
-                while((lineaLeida = leerArchivo.readLine()) != null) {
-                    String[] palabras = lineaLeida.split(" ");
-                    for(int i = 0 ; i < palabras.length ; i++) {
-                        if(palabras[i].equals(palabra)) {
-                            palabras[i] = reemplazo;
-                        }
-                    }
-                }
+			if(palabra.isEmpty() || reemplazo.isEmpty()) {
+				JOptionPane.showMessageDialog(null, "El campo de texto está vacío");
+			}else {
+				if(archivo.exists()) {
+	                crearArchivo();
+	                String texto = "";
+					FileWriter fw = new FileWriter(archivocopy);
+					BufferedWriter bw = new BufferedWriter(fw);
+					BufferedReader leerArchivo = new BufferedReader(new FileReader(archivo));
+	                String lineaLeida;
+	                while((lineaLeida = leerArchivo.readLine()) != null) {
+	                    String[] palabras = lineaLeida.split(" ");
+	                    for(int i = 0 ; i < palabras.length ; i++) {
+	                        if(palabras[i].equals(palabra)) {
+	                            palabras[i] = reemplazo;  
+	                        }
+	                        texto += palabras[i] + " ";
+	                    }
+	                    bw.write(texto);
+	                }
+	                bw.close();
+	                leerArchivo.close();
+				}
 			}
 		}catch(Exception e) {
 			System.out.println(e.getMessage());
@@ -81,18 +99,13 @@ public class Model {
 	}
 	
 	public static void crearArchivo() {
-		File fichero = new File ("C:/Users/gaarag/Documents/DAM 2º/AD/HolaMundo/src/es/florida/ejT1/ej2_9/document_copy.txt");
+		File fichero = archivocopy;
 		try {
-			if (!fichero.exists()) {
-			  if (fichero.createNewFile()) {
-				  System.out.println("El fitxer s'ha creat correctament");
-			  }
-			  else {
-				  System.out.println("Ha hagut un problema al crear el fitxer");  
-			  }
-			}else {
-				System.out.println("El fitxer ja existeix"); 
-			}
+		  if (fichero.createNewFile()) {
+			  JOptionPane.showMessageDialog(null, "El fitxer s'ha creat correctament");
+		  }else {
+			  JOptionPane.showMessageDialog(null, "Fitxer sobreredactat");
+		  }
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
