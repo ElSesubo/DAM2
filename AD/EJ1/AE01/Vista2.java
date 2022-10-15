@@ -1,15 +1,20 @@
 package AE01;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
@@ -22,6 +27,9 @@ import java.util.regex.Pattern;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.JTextArea;
@@ -41,6 +49,7 @@ import javax.swing.JOptionPane;
 import java.awt.Font;
 import javax.swing.JScrollPane;
 import javax.swing.JList;
+import javax.swing.ImageIcon;
 
 public class Vista2 extends JFrame {
 
@@ -49,10 +58,9 @@ public class Vista2 extends JFrame {
 	JButton btnBuscar;
 	JButton btnCopiar;
 	DefaultListModel<Object> listModel;
-	static JList<Object> list;
+	static JList<Object> list; 
 	JScrollPane scrollPane;
 	JTextArea textContingut;
-	//CrearFitxer nombreFitxer = new CrearFitxer();
 	JButton btnCrear;
 	JButton btnCanviarN;
 	JButton btnBuscarO;
@@ -60,7 +68,8 @@ public class Vista2 extends JFrame {
 	JButton btnReemplazar;
 	JButton btnGuardar;
 	JButton btnSuprimir;
-	String ruta="";
+	String ruta=""; // On s'emmagatzema la ruta del directori
+	static boolean activado = false;
 
 	/**
 	 * Launch the application.
@@ -103,9 +112,6 @@ public class Vista2 extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				ruta=abrir();
 				textField.setText(ruta);
-				cargarLista(ruta);
-				abrirArchivo(ruta);
-				datos(ruta);
 				Refrescar();
 			}
 		});
@@ -117,9 +123,9 @@ public class Vista2 extends JFrame {
 		btnCrear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				crearFitxer(ruta);
-				cargarLista(ruta);
-				abrirArchivo(ruta);
-				datos(ruta);
+				textField.setText("");
+				textContingut.setText("");
+				Refrescar();
 			}
 		});
 		btnCrear.setBounds(26, 321, 185, 34);
@@ -129,9 +135,7 @@ public class Vista2 extends JFrame {
 		btnCanviarN.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				cambiarNombre(ruta);
-				cargarLista(ruta);
-				abrirArchivo(ruta);
-				datos(ruta);
+				Refrescar();
 			}
 		});
 		btnCanviarN.setEnabled(false);
@@ -141,12 +145,9 @@ public class Vista2 extends JFrame {
 		btnCopiar = new JButton("Copiar Fitxer");
 		btnCopiar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(copyFile(ruta, textField.getText()) == true) {
+				if(copyFile(ruta+"/"+list.getSelectedValue()) == true) {
 					JOptionPane.showMessageDialog(null, "Fitxer copiat correctament");
 				}
-				cargarLista(ruta);
-				abrirArchivo(ruta);
-				datos(ruta);
 				Refrescar();
 			}
 		});
@@ -155,26 +156,79 @@ public class Vista2 extends JFrame {
 		contentPane.add(btnCopiar);
 		
 		btnEditar = new JButton("Editar");
+		btnEditar.setIcon(null);
 		btnEditar.setEnabled(false);
 		btnEditar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				textContingut.setEditable(true);
+				if(activado == false) {
+					textContingut.setEnabled(true);;
+					activado = true;
+				}else {
+					textContingut.setEnabled(false);
+					activado = false;
+				}
 			}
 		});
 		btnEditar.setBounds(235, 427, 89, 61);
 		contentPane.add(btnEditar);
 		
 		btnBuscarO = new JButton("Buscar");
+		btnBuscarO.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JTextField buscar= new JTextField();
+	    		
+	    		Object[] fields = {
+	    				"Palabra a buscar: ", buscar
+	    		};   		
+	    		int opcion=JOptionPane.showConfirmDialog(null,fields,"Buscar paraula",JOptionPane.OK_CANCEL_OPTION);
+	    		if(opcion == JOptionPane.OK_OPTION) {
+	    			int contador=buscarpalabra(textContingut,buscar.getText());
+	    			JOptionPane.showMessageDialog(null,"Numero de coincidencies: "+contador);
+	    		}
+	    		
+			}
+		});
 		btnBuscarO.setEnabled(false);
 		btnBuscarO.setBounds(357, 427, 89, 61);
 		contentPane.add(btnBuscarO);
 		
 		btnReemplazar = new JButton("Reemplaçar");
+		btnReemplazar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JTextField buscar= new JTextField();
+				JTextField remplazar= new JTextField();
+	    		Object[] fields = {
+	    				"Palabra a remplazar: ", buscar,
+	    				"Palabra nueva: ", remplazar
+	    		};   		
+	    		int opcion=JOptionPane.showConfirmDialog(null,fields,"Remplaçar paraula",JOptionPane.OK_CANCEL_OPTION);
+	    		if(opcion == JOptionPane.OK_OPTION) {
+    			int contador=reemplazarPalabras(buscar.getText(),remplazar.getText(),textContingut);
+    			JOptionPane.showMessageDialog(null,"Total de coincidencies canviades: "+contador);
+	    		}
+	    		
+			}
+		});
 		btnReemplazar.setEnabled(false);
 		btnReemplazar.setBounds(480, 427, 89, 61);
 		contentPane.add(btnReemplazar);
 		
 		btnGuardar = new JButton("Guardar");
+		btnGuardar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int resp =JOptionPane.showConfirmDialog(null,"SEGUR QUE VOLS GUARDAR?", "GUARDAR",
+			               JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
+				guardar(textField.getText(),resp);
+				try {
+					leer(ruta+"/"+list.getSelectedValue());
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				textField.setText("");
+				textContingut.setText("");
+				Refrescar();
+			}
+		});
 		btnGuardar.setEnabled(false);
 		btnGuardar.setBounds(609, 427, 89, 61);
 		contentPane.add(btnGuardar);
@@ -182,13 +236,13 @@ public class Vista2 extends JFrame {
 		btnSuprimir = new JButton("Suprimir Fitxer");
 		btnSuprimir.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int resp =JOptionPane.showConfirmDialog(null,"SEGURO QUE QUIERES ELIMINAR?", "ELIMINAR",
+				int resp =JOptionPane.showConfirmDialog(null,"SEGUR QUE VOLS ELIMINAR?", "ELIMINAR",
 			               JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
 				eliminar(ruta+"/"+list.getSelectedValue().toString(),resp);
-				cargarLista(ruta);
-				abrirArchivo(ruta);
-				datos(ruta);
-			}
+				textField.setText("");
+				textContingut.setText("");
+				Refrescar();
+				}
 		});
 		btnSuprimir.setEnabled(false);
 		btnSuprimir.setBounds(26, 456, 185, 34);
@@ -211,11 +265,16 @@ public class Vista2 extends JFrame {
 		contentPane.add(scrollPane_1);
 		
 		textContingut = new JTextArea();
-		textContingut.setEditable(false);
+		textContingut.setEnabled(false);
 		scrollPane_1.setViewportView(textContingut);
 
 	}
 	
+	
+	/**
+	 * Obrix un selector de directoris on pots tria una carpeta de treball
+	 * @return retorna la adressa del directori seleccionat
+	 */
 	public static String abrir() {
         JFileChooser f = new JFileChooser();
         f.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); 
@@ -223,11 +282,20 @@ public class Vista2 extends JFrame {
         return f.getSelectedFile().toString();
     }
 	
+	/**
+	 * Carrega un array amb els arxius del directori seleccionat
+	 * @param fa referencia a un parametre de tipus File que conté la ruta del directori
+	 * @return un array de strings pasats per un filtre d'extensió
+	 */
 	public static String[] cargararchivos(File arc) {
         Filtro filtro=new Filtro(".txt");
         return arc.list(filtro);
     }
 	
+	/**
+	 * Carrega una lista dels arxius del directori a un objecte Jlist
+	 * @param arch, ruta del directori
+	 */
 	public void cargarLista(String arch) {
 		File archivo = new File(arch);
         String[] Lista= cargararchivos(archivo);
@@ -241,6 +309,11 @@ public class Vista2 extends JFrame {
         list.setModel(listModel);
     }
 	
+	/**
+	 * Llegix el contingut d'un fitxer txt
+	 * @param ruta, ruta del arxiu
+	 * @return String amb tot el contingut del fitxer
+	 */
 	public static String leer(String ruta) throws IOException {
         String currentLine;
         String texto="";
@@ -253,17 +326,21 @@ public class Vista2 extends JFrame {
              reader.close();
 
          }catch (FileNotFoundException e){
-             System.err.println("Error al leer.");
+             System.err.println("Error al llegir.");
          }
         return texto;
     }
 	
+	/**
+	 * Obrix el contingut del fitxer seleccionat per index i el mostra en el textArea, també mostra la ruta en el textField
+	 * @param arch, ruta del directori
+	 */
 	public void abrirArchivo(String arch){
 		File archivo = new File(arch);
         list.addMouseListener((MouseListener) new MouseAdapter() {
             public void mouseClicked(MouseEvent evt) {
                 list = (JList)evt.getSource();
-                if (evt.getClickCount() == 2) {
+                if (evt.getClickCount() == 1) {
                     int index = list.locationToIndex(evt.getPoint());
                     try {
                         textContingut.setText(leer(archivo+"/"+list.getSelectedValue()));
@@ -271,68 +348,50 @@ public class Vista2 extends JFrame {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    comprobar();
                     System.out.println("index: "+index);
                 } 
             }
         });
     }
 	
-	public static void crearFitxer(String arch) {
-			try {
-				JTextField nombre= new JTextField();
-				
-				Object[] fields = {
-						"Nom arxiu: ", nombre
-				};  
-				int opcion=JOptionPane.showConfirmDialog(null,fields,"Nom arxiu",JOptionPane.OK_CANCEL_OPTION);
-				File fichero = new File (arch + "/" + nombre.getText());
-				if (!fichero.exists()) {
-		    		if(opcion == JOptionPane.OK_OPTION) {
-		    			if (fichero.createNewFile()) {
-							JOptionPane.showMessageDialog(null, "Fitxer creat correctament");
-						}
-						else {
-							JOptionPane.showMessageDialog(null, "Ha hagut un problema al crear el fitxer");  
-						};
-		    		}	
-				}
-			} catch (IOException ioe) {
-				ioe.printStackTrace();
+	/**
+	 * Crea un fitxer depenent del nom proporcionat
+	 * @param arch, ruta del directori
+	 * @return String de la ruta completa del arxiu nou
+	 */
+	public static String crearFitxer(String arch) {
+		String ruta = "";
+		JTextField nombre= new JTextField();
+		try {
+			Object[] fields = {
+					"Nom arxiu: ", nombre
+			};  
+			int opcion=JOptionPane.showConfirmDialog(null,fields,"Nom arxiu",JOptionPane.OK_CANCEL_OPTION);
+			File fichero = new File (arch + "/" + nombre.getText());
+			if (!fichero.exists()) {
+	    		if(opcion == JOptionPane.OK_OPTION) {
+	    			if (fichero.createNewFile()) {
+						JOptionPane.showMessageDialog(null, "Fitxer creat correctament");
+					}
+					else {
+						JOptionPane.showMessageDialog(null, "Ha hagut un problema al crear el fitxer");
+					}
+	    		}	
 			}
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
 		}
-	
-	
-	
-	//Este metodo lo hemos remplazado por otro mejor
-//	public static String obtenerInfo(String archivo) {
-//		File fichero = new File(archivo);
-//		String texto = "";
-//		
-//		texto += "Nom del arxiu: " + fichero.getName() + "\n";
-//		texto += "Ruta: " + fichero.getPath() + "\n";
-//		texto += "Tamany: " + fichero.length() + "\n";
-//		
-//		return texto;
-//	}
-	
-	
-    public static String mostrarContingut(String archivo) {
-    	String texto = "";
-		try(FileReader fileReader = new FileReader(archivo)){
-	        int caracterLeido = fileReader.read();
-	        while(caracterLeido!= -1) {
-	            char caracter = (char) caracterLeido;
-	            caracterLeido = fileReader.read();
-	            texto += caracter;
-	        }
-	    }catch(IOException ex){
-	        System.err.println("Error al leer el archivo");
-	        ex.printStackTrace();
-	    }
-		return texto;
-    }
+		ruta = (arch + "/" + nombre.getText());
+		return ruta;
+	}
     
-    public static void eliminar(String ruta, int opcion) {
+    /**
+     * Elimina fitxers
+     * @param ruta, ruta completa del arxiu
+     * @param opcion, opcio que se li dona a elegir al usuari anteriormente 0 o 1
+     */
+    public static void eliminar(String ruta,int opcion) {
 		File dirfit = new File(ruta);
 		
 		if(opcion==0) {
@@ -347,22 +406,25 @@ public class Vista2 extends JFrame {
 					JOptionPane.showMessageDialog(null,"El fitxer no existeix");
 				}
 		}
-		
 	}
     
+    /**
+     * Cambia el nom d'un arxiu txt, també es pot cambiar la seua extensió
+     * @param ruta, ruta del directori
+     */
     public static void cambiarNombre(String ruta) {
     	File fichero = new File(ruta+"/"+list.getSelectedValue());
     	if(fichero.exists()) {
     		JTextField nuevo= new JTextField();
     		
     		Object[] fields = {
-    				"Nom arxiu: ", nuevo
+    				"Nombre nuevo: ", nuevo
     		};   		
-    		int opcion=JOptionPane.showConfirmDialog(null,fields,"Cambiar nombre",JOptionPane.OK_CANCEL_OPTION);
+    		int opcion=JOptionPane.showConfirmDialog(null,fields,"Canviar nom",JOptionPane.OK_CANCEL_OPTION);
     		if(opcion == JOptionPane.OK_OPTION) {
     			File nombre = new File(ruta+"/"+nuevo.getText());
     			if(fichero.renameTo(nombre)) {
-    				 JOptionPane.showMessageDialog(null,"Nombre cambiado con exito");
+    				 JOptionPane.showMessageDialog(null,"Nom canviat exitosament");
     			}else{
     				JOptionPane.showMessageDialog(null,"Error al cambiar");
     			};
@@ -370,7 +432,12 @@ public class Vista2 extends JFrame {
 		}
     }
     
-    public boolean copyFile(String fromFile, String toFile) {
+    /**
+     * Copia el fitxer elegit sobre el mateix directori
+     * @param toFile, ruta completa del fitxer
+     * @return true o false, solament per a comprobar si s'ha creat o no
+     */
+    public boolean copyFile(String toFile) {
     	String destinacion = toFile.replace(".txt", "");
         File origin = new File(toFile);
         File destination = new File(destinacion + "_copy.txt");
@@ -402,56 +469,60 @@ public class Vista2 extends JFrame {
         }
     }
     
-	public void reemplazarPalabra(String palabra, String reemplazo, String archivo) {
-		try {
-			if(palabra.isEmpty() || reemplazo.isEmpty()) {
-				JOptionPane.showMessageDialog(null, "El campo de texto está vacío");
-			}else {
-				String patron = "\\b"+ palabra + "\\b";
-						
-				BufferedReader leerArchivo = new BufferedReader(new FileReader(archivo));
-                String lineaLeida;
-                while((lineaLeida = leerArchivo.readLine()) != null) {
-                	Pattern pattern = Pattern.compile(patron);
-    				Matcher matcher = pattern.matcher(lineaLeida);
-    				matcher.replaceAll(reemplazo);
+    /**
+     * Reemplaça les paraules seleccionades per altres
+     * @param palabra, paraula a buscar per a reemplaçar
+     * @param reemplazo, paraula que reemplaça 
+     * @param area1, textArea on está el text
+     * @return contador de coincidencies
+     */
+    public int reemplazarPalabras(String palabra, String reemplazo, JTextArea area1) {
+    	String text = area1.getText();
+    	String nuevo=text.replaceAll(palabra, reemplazo);
+    	int cont=0;
+    	Pattern p = Pattern.compile("(?i)" + palabra);
+        Matcher m = p.matcher(text);
+        while (m.find()) {
+            cont++;
+        }
+    	textContingut.setText(nuevo);
+    	return cont;
+    }
+	
+    /**
+     * Busca la paraula seleccionada en el textArea
+     * @param area1, textArea on está el text
+     * @param texto, text que vols buscar
+     * @return contador de coincidencies
+     */
+	public int buscarpalabra(JTextArea area1, String texto) {
+		int cont=0;
+        if (texto.length() >= 1) {
+            DefaultHighlighter.DefaultHighlightPainter highlightPainter = new DefaultHighlighter.DefaultHighlightPainter(Color.GREEN);
+            Highlighter h = area1.getHighlighter();
+            h.removeAllHighlights();
+            String text = area1.getText();
+            String caracteres = texto;
+            Pattern p = Pattern.compile("(?i)" + caracteres);
+            Matcher m = p.matcher(text);
+            while (m.find()) {
+                try {
+                    h.addHighlight(m.start(), m.end(), highlightPainter);
+                    cont++;
+                } catch (BadLocationException ex) {
+                    
                 }
-			}
-		}catch(Exception e) {
-			System.out.println(e.getMessage());
-		}
-	}
+            }
+        } else {
+            JOptionPane.showMessageDialog(area1, "la paraula a buscar no pot estar buida");
+        }
+        return cont;
+    }
 	
-	public static void infoDirectorio(String directorio) {
-		File direc = new File(directorio);
-		String texto = "";
-		String[] listaArchivos = direc.list();
-
-		for (int i = 0; i < listaArchivos.length; i++) {
-				texto += listaArchivos[i] + "\n";
-		}
-	}
-	
-	public void buscarPalabra(String palabra, String archivo) {
-		try {
-			if(palabra.isEmpty()) {
-				JOptionPane.showMessageDialog(null, "El campo de texto está vacío");
-			}else {
-				String patron = "\\b"+ palabra + "\\b";
-						
-				BufferedReader leerArchivo = new BufferedReader(new FileReader(archivo));
-                String lineaLeida;
-                while((lineaLeida = leerArchivo.readLine()) != null) {
-                	Pattern pattern = Pattern.compile(patron);
-    				Matcher matcher = pattern.matcher(lineaLeida);
-    				matcher.replaceAll(palabra);
-                }
-			}
-		}catch(Exception e) {
-			System.out.println(e.getMessage());
-		}
-	}
-	
+	/**
+	 * Al pasar el ratolí per d'amunt del arxiu txt mostrara tota la informació requerida
+	 * @param arch, ruta del directori
+	 */
 	public void datos(String arch) {
 		File archivo = new File(arch);
         list.addMouseMotionListener((MouseMotionListener) new MouseMotionAdapter() {
@@ -462,7 +533,7 @@ public class Vista2 extends JFrame {
                 int index = l.locationToIndex(e.getPoint());
                 if( index>-1 ) {
                     File arg=new File(archivo+"/"+m.getElementAt(index).toString());
-                    double tamaño=arg.length()/2024;
+                    double tamanyo=arg.length()/1000;
                     BasicFileAttributes attrs;
                     String formatted="";
                     try {
@@ -477,14 +548,85 @@ public class Vista2 extends JFrame {
 
                     }
 
-                    l.setToolTipText("<html>" + "Nombre: "+m.getElementAt(index).toString() + "<br>" + "Tamaño:"+tamaño+"MB" + "<br>" +
-                    "Fecha creación: " + formatted +"<br>"+"Ruta: "+arg.getAbsolutePath()+"<br>"+ "<br>"+"Executable: " + arg.canExecute()+"<br>"+"Readable: "+arg.canRead()+
+                    l.setToolTipText("<html>" + "Nom: "+m.getElementAt(index).toString() + "<br>" + "Tamanyo:"+tamanyo+"KB" + "<br>" +
+                    "Data creació: " + formatted +"<br>"+"Ruta: "+arg.getAbsolutePath()+"<br>"+ "<br>"+"Executable: " + arg.canExecute()+"<br>"+"Readable: "+arg.canRead()+
                     "<br>"+"Writable: "+ arg.canWrite()+"</html>");
                 }
             }
         });
     }
 	
+	/**
+	 * Dona a elegir si vol guardar l'arxiu en altre nou o sobreescrivir-o sobre el mateix
+	 * @param arch, ruta del fitxer txt
+	 * @param opcion, int 0 o 1 d'un showOptionDialog anterior
+	 */
+	public void guardar(String arch,int opcion) {
+		if(opcion==0) {
+			int resp =JOptionPane.showOptionDialog(null,"GUARDAR EN EL MISMO O UNO NUEVO?", "GUARDAR",
+		               JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE, null, new Object[] { "sobreescriure", "nou" }, null);
+			
+				if(resp == 0) {
+					try {
+						BufferedWriter bw=new BufferedWriter(new FileWriter(arch));
+						bw.write(textContingut.getText().toString());
+						bw.close();
+						JOptionPane.showMessageDialog(null,"Guardat exitosament");
+					}catch(IOException e)
+					{
+						JOptionPane.showMessageDialog(null,"Error al guardar");
+					}
+				}else {
+					try {
+						BufferedWriter bw=new BufferedWriter(new FileWriter(crearFitxer(ruta)));
+						bw.write(textContingut.getText().toString());
+						bw.close();
+					}catch(IOException e)
+					{
+					}
+				}
+			try {
+				leer(ruta+"/"+list.getSelectedValue());
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+		
+	}
+	
+	/**
+	 * Depenent de si un arxiu está seleccionat o no activara els botons
+	 */
+	public void comprobar() {
+		if(list.getSelectedIndex()==-1||textField.getText().equals("")) {
+			btnCanviarN.setEnabled(false);
+			btnSuprimir.setEnabled(false);
+			btnCopiar.setEnabled(false);
+			btnEditar.setEnabled(false);
+			btnGuardar.setEnabled(false);
+			btnBuscarO.setEnabled(false);
+			btnReemplazar.setEnabled(false);
+		}else {
+			btnCrear.setEnabled(true);
+			btnCanviarN.setEnabled(true);
+			btnSuprimir.setEnabled(true);
+			btnCopiar.setEnabled(true);
+			btnEditar.setEnabled(true);
+			if(textContingut.getText().equals("")) {
+				btnBuscarO.setEnabled(false);
+				btnReemplazar.setEnabled(false);
+				btnGuardar.setEnabled(true);
+			}else {
+				btnBuscarO.setEnabled(true);
+				btnReemplazar.setEnabled(true);
+				btnGuardar.setEnabled(true);
+			}
+		}
+	}
+	
+	/**
+	 * Refresca el programa utilitçant metodes anteriors
+	 */
 	public void Refrescar() {
 		if(textField.getText() == "") {
 			btnCrear.setEnabled(false);
@@ -505,6 +647,9 @@ public class Vista2 extends JFrame {
 			btnBuscarO.setEnabled(true);
 			btnReemplazar.setEnabled(true);
 		}
+		comprobar();
+		cargarLista(ruta);
+		abrirArchivo(ruta);
 		datos(ruta);
 	}
 }
