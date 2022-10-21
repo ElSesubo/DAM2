@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -20,6 +22,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class ej3_8 {
 
@@ -59,37 +62,34 @@ private String titulo, dinerorestante;
 		return objeto;
 	}
 	
-	public static void guardarResultat(ArrayList<ej3_8> lista) {
+	public static void guardarResultat(ArrayList<ej3_8> lista) throws SAXException, IOException {
 		try {
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			Document doc = (Document) dBuilder.parse(new File("./venezuela.xml"));
 			Element raiz = doc.getDocumentElement();
 			NodeList nodeList = doc.getElementsByTagName("ciudad");
-			for (int i = 0; i < nodeList.getLength(); i++) {
+			for (int i = 0; i < lista.size(); i++) {
 				Node node = nodeList.item(i);
 				Element eElement = (Element) node;
-				Element cancion = doc.createElement("canço");
+				Element ciudad = doc.createElement("ciudad");
 				String id = String.valueOf(eElement.getAttribute("ciudad"));
-				cancion.setAttribute("ciudad",id); raiz.appendChild(cancion);
-				Element titulo = doc.createElement("titol");
-				titulo.appendChild(doc.createTextNode(String.valueOf(can.getTitulo())));
-				cancion.appendChild(titulo);
-				Element artista = doc.createElement("artista");
-				artista.appendChild(doc.createTextNode(String.valueOf(can.getTitulo())));
-				cancion.appendChild(artista);
-				Element anyo = doc.createElement("any");
-				anyo.appendChild(doc.createTextNode(String.valueOf(can.getDinero())));
-				cancion.appendChild(anyo);
+				ciudad.setAttribute("ciudad",id); raiz.appendChild(ciudad);
+				Element titulo = doc.createElement("titulo");
+				titulo.appendChild(doc.createTextNode(String.valueOf(lista.get(i).getTitulo())));
+				ciudad.appendChild(titulo);
+				Element dinero = doc.createElement("dinerorestante");
+				dinero.appendChild(doc.createTextNode(String.valueOf(lista.get(i).getDinero())));
+				ciudad.appendChild(dinero);
 			}
 			TransformerFactory tranFactory = TransformerFactory.newInstance(); 
 			Transformer aTransformer = tranFactory.newTransformer();
-			aTransformer.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1"); // Formato al document
+			aTransformer.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1"); 
 			aTransformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 			aTransformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			DOMSource source = new DOMSource(doc);
 			try {
-				FileWriter fw = new FileWriter("venezuela2.xml"); // Definir el nom del fitxer i guardar
+				FileWriter fw = new FileWriter("venezuela2.xml"); 
 				StreamResult result = new StreamResult(fw);
 				aTransformer.transform(source, result);
 				fw.close();
@@ -100,6 +100,19 @@ private String titulo, dinerorestante;
 			System.out.println("Error escrivint el documento");
 		} catch (ParserConfigurationException ex) {
 			System.out.println("Error construint el document");
+		}
+	}
+	
+	public static void crearFitxer() {
+		try {
+			File fichero = new File ("./venezuela2.xml");
+			if (!fichero.exists()) {
+    			if (fichero.createNewFile()) {
+					System.out.println("fitxer creat");
+				}
+			}
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
 		}
 	}
 
@@ -128,6 +141,7 @@ private String titulo, dinerorestante;
 			}
 			objetos.add(agregarRegistre());
 			objetos.forEach((n) -> System.out.println(n.getTitulo() + n.getDinero()));
+			guardarResultat(objetos);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
