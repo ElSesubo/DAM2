@@ -1,6 +1,5 @@
 package es.florida.ej3_9;
 
-import java.sql.Date;
 import java.util.ArrayList;
 
 public class Llibreria {
@@ -92,17 +91,19 @@ public class Llibreria {
 	}
 	
 	public void mostrarLlibre(int id) {
-		System.out.println(llibres.get(id).getTitol() + "\n" + llibres.get(id).getAutor() + "\n" + llibres.get(id).getAnyPublicacio() 
-				+ "\n" + llibres.get(id).getEditorial() + "\n" + llibres.get(id).getNumPagines());	
+		id = id - 1;
+		System.out.println("\nTitol: " + llibres.get(id).getTitol() + "\n" + "Autor: " + llibres.get(id).getAutor() + "\n" + "Any publicació: " + llibres.get(id).getAnyPublicacio() 
+				+ "\n" + "Editorial: " + llibres.get(id).getEditorial() + "\n" + "Numero Págines: " + llibres.get(id).getNumPagines());	
 	}
 	
 
 	public void borrarRegistre(int id) {
+		id = id - 1;
 		llibres.remove(id);
 		System.out.println("Llibre eliminat");
 	}
 	
-	public void actualitzarRegistre(int id,String tit, String aut, String any, String edit, int num) {
+	public void actualitzarRegistre(int id, String tit, String aut, String any, String edit, int num) {
 		Llibreria libroAct = new Llibreria(tit, aut, any, edit, num);
 		llibres.set(id, libroAct);
 		System.out.println("Llibre actualitzat");
@@ -111,7 +112,7 @@ public class Llibreria {
 	public void recuperarTots() {
 		for(int i = 0; i < llibres.size(); i++) {
 			llibres.get(i);
-			System.out.println(llibres.get(i).getTitol());
+			System.out.println((i+1) + ". " + llibres.get(i).getTitol());
 		}
 	}
 }
