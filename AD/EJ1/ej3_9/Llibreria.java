@@ -9,7 +9,6 @@ public class Llibreria {
 	private String anyPublicacio;
 	private String editorial;
 	private int numPagines;
-	private ArrayList<Llibreria> llibres = new ArrayList<Llibreria>();
 
 	public Llibreria() {
 		
@@ -22,14 +21,6 @@ public class Llibreria {
 		this.anyPublicacio = anyPublicacio;
 		this.editorial = editorial;
 		this.numPagines = numPagines;
-	}
-	
-	public ArrayList<Llibreria> getLista(){
-		return this.llibres;
-	}
-	
-	public void setLista(ArrayList<Llibreria> llibres) {
-		this.llibres = llibres;
 	}
 	
 	public static int getIdentificador() {
@@ -75,44 +66,36 @@ public class Llibreria {
 	public void setNumPagines(int numPagines) {
 		this.numPagines = numPagines;
 	}
-
-	public ArrayList<Llibreria> getLlibres() {
-		return llibres;
-	}
-
-	public void setLlibres(ArrayList<Llibreria> llibres) {
-		this.llibres = llibres;
-	}
 	
-	public int crearLlibre(String tit, String aut, String any, String edit, int num) {
-		Llibreria libro = new Llibreria(tit, aut, any, edit, num);
-		llibres.add(libro);
-		return identificador;
-	}
-	
-	public void mostrarLlibre(int id) {
-		id = id - 1;
-		System.out.println("\nTitol: " + llibres.get(id).getTitol() + "\n" + "Autor: " + llibres.get(id).getAutor() + "\n" + "Any publicació: " + llibres.get(id).getAnyPublicacio() 
-				+ "\n" + "Editorial: " + llibres.get(id).getEditorial() + "\n" + "Numero Págines: " + llibres.get(id).getNumPagines());	
-	}
-	
-
-	public void borrarRegistre(int id) {
-		id = id - 1;
-		llibres.remove(id);
-		System.out.println("Llibre eliminat");
-	}
-	
-	public void actualitzarRegistre(int id, String tit, String aut, String any, String edit, int num) {
-		Llibreria libroAct = new Llibreria(tit, aut, any, edit, num);
-		llibres.set(id, libroAct);
-		System.out.println("Llibre actualitzat");
-	}
-	
-	public void recuperarTots() {
-		for(int i = 0; i < llibres.size(); i++) {
-			llibres.get(i);
-			System.out.println((i+1) + ". " + llibres.get(i).getTitol());
-		}
-	}
+//	public int crearLlibre(String tit, String aut, String any, String edit, int num) {
+//		Llibreria libro = new Llibreria(tit, aut, any, edit, num);
+//		llibres.add(libro);
+//		return identificador;
+//	}
+//	
+//	public void mostrarLlibre(int id) {
+//		id = id - 1;
+//		System.out.println("\nTitol: " + llibres.get(id).getTitol() + "\n" + "Autor: " + llibres.get(id).getAutor() + "\n" + "Any publicació: " + llibres.get(id).getAnyPublicacio() 
+//				+ "\n" + "Editorial: " + llibres.get(id).getEditorial() + "\n" + "Numero Págines: " + llibres.get(id).getNumPagines());	
+//	}
+//	
+//
+//	public void borrarRegistre(int id) {
+//		id = id - 1;
+//		llibres.remove(id);
+//		System.out.println("Llibre eliminat");
+//	}
+//	
+//	public void actualitzarRegistre(int id, String tit, String aut, String any, String edit, int num) {
+//		Llibreria libroAct = new Llibreria(tit, aut, any, edit, num);
+//		llibres.set(id, libroAct);
+//		System.out.println("Llibre actualitzat");
+//	}
+//	
+//	public void recuperarTots() {
+//		for(int i = 0; i < llibres.size(); i++) {
+//			llibres.get(i);
+//			System.out.println((i+1) + ". " + llibres.get(i).getTitol());
+//		}
+//	}
 }

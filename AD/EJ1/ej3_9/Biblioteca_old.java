@@ -26,17 +26,18 @@ import org.xml.sax.SAXException;
 
 public class Biblioteca {
 	
-	static Scanner teclado = new Scanner(System.in);
-	static Llibreria llibreria = new Llibreria();
-	static ArrayList<Llibreria> llibres = new ArrayList<Llibreria>();
-	
 	public static void guardarResultat(ArrayList<Llibreria> lista) throws SAXException, IOException {
 		try {
+			File Old_File=new File("venezuel2.txt");
+		    Old_File.delete();
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			Document doc = (Document) dBuilder.parse(new File("./venezuela.xml"));
 			Element raiz = doc.getDocumentElement();
+			NodeList nodeList = doc.getElementsByTagName("llibre");
 			for (int i = 0; i < lista.size(); i++) {
+				Node node = nodeList.item(i);
+				Element eElement = (Element) node;
 				Element llibre = doc.createElement("llibre");
 				String id = String.valueOf((i+1));
 				llibre.setAttribute("id",id); raiz.appendChild(llibre);
@@ -71,17 +72,23 @@ public class Biblioteca {
 			e.printStackTrace();
 			}
 		} catch (TransformerException ex) {
-			System.out.println(ex);
+			System.out.println("Error escrivint el documento");
 		} catch (ParserConfigurationException ex) {
-			System.out.println(ex);
+			System.out.println("Error construint el document");
 		}
 	}
 
 	public static void main(String[] args) {
+		// TODO Auto-generated method stub
 		try {
+			Scanner teclado = new Scanner(System.in);
+			int acumuladorNode = 0;
+			Llibreria llibreria = new Llibreria(); //= new Llibreria("aisdj","asd", "2022-12-12", "asd", 2);
+			ArrayList<Llibreria> llibres = new ArrayList<Llibreria>();
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			Document document = (Document) dBuilder.parse(new File("./venezuela.xml"));
+			Element raiz = document.getDocumentElement();
 			NodeList nodeList = document.getElementsByTagName("llibre");
 			for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
@@ -93,10 +100,11 @@ public class Biblioteca {
 					String editorial = eElement.getElementsByTagName("editorial").item(0).getTextContent();
 					int numPagines = Integer.parseInt(eElement.getElementsByTagName("numPagines").item(0).getTextContent());
 					
-					llibreria = new Llibreria(titol, autor, anyPublicacio, editorial, numPagines);
+					llibreria =  new Llibreria(titol, autor, anyPublicacio, editorial, numPagines);
 					llibres.add(llibreria);
 				}
 			}
+			llibreria.setLista(llibres);
 			int opcio;
 			String opcion = "";
 			boolean continuar = false;
@@ -113,33 +121,33 @@ public class Biblioteca {
 					case "1":
 						limpiarConsola();
 						System.out.println("");
-						recuperarTots();
+						llibreria.recuperarTots();
 						continuar = continuar();
 						
 					break;
 					case "2":
 						limpiarConsola();
 						System.out.println("");
-						recuperarTots();
+						llibreria.recuperarTots();
 						System.out.print("Quin llibre vols elegir: ");
 						opcio = Integer.parseInt(teclado.nextLine());
-						mostrarLlibre(opcio);
+						llibreria.mostrarLlibre(opcio);
 						continuar = continuar();
 					break;
 					case "3":
 						limpiarConsola();
 						System.out.println("");
-						crearLlibre();
+						System.out.println("Llibre creat exitosamente amb l'identificador: " + llibreria.crearLlibre("aisdj","asd", "2022-12-12", "asd", 2));
 						guardarResultat(llibres);
 						continuar = continuar();
 					break;
 					case "4":
 						limpiarConsola();
 						System.out.println("");
-						recuperarTots();
+						llibreria.recuperarTots();
 						System.out.print("Quin llibre vols actualitzar: ");
 						opcio = Integer.parseInt(teclado.nextLine());
-						mostrarLlibre(opcio);
+						llibreria.mostrarLlibre(opcio);
 						System.out.println("");
 						actualitzar(opcio);
 						guardarResultat(llibres);
@@ -148,11 +156,11 @@ public class Biblioteca {
 					case "5":
 						limpiarConsola();
 						System.out.println("");
-						recuperarTots();
+						llibreria.recuperarTots();
 						System.out.print("Quin llibre vols borrar? ");
 						opcio = Integer.parseInt(teclado.nextLine());
 						if(continuar() == false) {
-							borrarRegistre(opcio);
+							llibreria.borrarRegistre(opcio);
 							guardarResultat(llibres);
 						}
 						continuar = continuar();
@@ -176,6 +184,7 @@ public class Biblioteca {
 	}  
 	
 	public static boolean continuar() {
+		Scanner teclado = new Scanner(System.in);
 		System.out.print("\nContinuar? Y/N ");
 		char opcion = teclado.nextLine().charAt(0);
 		if(opcion == 'Y' || opcion == 'y') {
@@ -187,6 +196,8 @@ public class Biblioteca {
 	
 	public static void actualitzar(int id) {
 		id = id - 1;
+		Llibreria llibreria = new Llibreria();
+		Scanner teclado = new Scanner(System.in);
 		System.out.print("Titol: ");
 		String titol = teclado.nextLine();
 		System.out.print("Autor: ");
@@ -198,54 +209,7 @@ public class Biblioteca {
 		System.out.print("Número págines: ");
 		int paginas = Integer.parseInt(teclado.nextLine());
 		
-		actualitzarRegistre(id, titol, autor, any, edit, paginas);
+		llibreria.actualitzarRegistre(id, titol, autor, any, edit, paginas);
 	}
 
-	public static void crearLlibre() {
-		System.out.print("Nom del llibre: ");
-		String nom = teclado.nextLine();
-		System.out.print("Autor del llibre: ");
-		String aut = teclado.nextLine();
-		System.out.print("Any del llibre: ");
-		String any = teclado.nextLine();
-		System.out.print("Editorial del llibre: ");
-		String ed = teclado.nextLine();
-		System.out.print("Págines del llibre: ");
-		int pag = Integer.parseInt(teclado.nextLine());
-		
-		
-		System.out.println("Llibre creat exitosamente amb l'identificador: " + crearLlibreAtri(nom,aut,any,ed,pag));
-	}
-	
-	public static int crearLlibreAtri(String tit, String aut, String any, String edit, int num) {
-		Llibreria libro = new Llibreria(tit, aut, any, edit, num);
-		llibres.add(libro);
-		return Llibreria.getIdentificador();
-	}
-	
-	public static void mostrarLlibre(int id) {
-		id = id - 1;
-		System.out.println("\nTitol: " + llibres.get(id).getTitol() + "\n" + "Autor: " + llibres.get(id).getAutor() + "\n" + "Any publicació: " + llibres.get(id).getAnyPublicacio() 
-				+ "\n" + "Editorial: " + llibres.get(id).getEditorial() + "\n" + "Numero Págines: " + llibres.get(id).getNumPagines());	
-	}
-	
-
-	public static void borrarRegistre(int id) {
-		id = id - 1;
-		llibres.remove(id);
-		System.out.println("Llibre eliminat");
-	}
-	
-	public static void actualitzarRegistre(int id, String tit, String aut, String any, String edit, int num) {
-		Llibreria libroAct = new Llibreria(tit, aut, any, edit, num);
-		llibres.set(id, libroAct);
-		System.out.println("Llibre actualitzat");
-	}
-	
-	public static void recuperarTots() {
-		for(int i = 0; i < llibres.size(); i++) {
-			llibres.get(i);
-			System.out.println((i+1) + ". " + llibres.get(i).getTitol());
-		}
-	}
 }
