@@ -5,62 +5,61 @@ import java.util.LinkedList;
 public class ControlSemaforos{
 	
 	public static class Semaforos {
-		boolean encendido;
+		int encendido = 1;
 		
-		public void encender() throws InterruptedException {
+		public void encenderSemaforo1() {
 			while(true) {
 				synchronized(this) {
-					encendido = true;
-					System.out.println("Semaforo encendido");
-					notify();
-					Thread.sleep(1000);
+					try {
+						while(encendido == 2) wait();
+						System.err.print("Semáforo 2 rojo ->");
+						System.out.println(" Tiempo del semáforo 1 en verde: " + 5000/1000 + " segundos");
+						Thread.sleep(5000);
+						encendido = 2;
+						notify();
+					}catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		}
 		
-		public void apagar() throws InterruptedException {
+		public void encenderSemaforo2() {
 			while(true) {
 				synchronized(this) {
-					encendido = false;
-					System.out.println("Semaforo apagado");
-					notify();
-					Thread.sleep(1000);
+					try {
+						while(encendido == 1) wait();
+						System.err.print("Semáforo 1 rojo ->");
+						System.out.println(" Tiempo del semáforo 2 en verde: " + 5000/1000 + " segundos");
+						Thread.sleep(5000);
+						encendido = 1;
+						notify();
+					}catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		}
 	}
 
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		final Semaforos semaforo = new Semaforos();
 		
 		Thread t1 = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
-				try {
-					semaforo.encender();
-				}catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				semaforo.encenderSemaforo1();
 			}
 		});
 		
 		Thread t2 = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
-				try {
-					semaforo.apagar();
-				}catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				semaforo.encenderSemaforo2();
 			}
 		});
 		t1.start();
 		t2.start();
-		
-		t1.join();
-		t2.join();
 	}
 }

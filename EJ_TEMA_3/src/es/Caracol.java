@@ -7,6 +7,7 @@ public class Caracol implements Runnable{
 	
 	private double velocidad;
 	private String nombre;
+	private static int ganadores = 0;
 	
 	public Caracol(double velocidad, String nombre) {
 		this.velocidad = velocidad;
