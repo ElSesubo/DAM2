@@ -1,4 +1,4 @@
-package AE02;
+package ejT2.AE02;
 
 public class Controlador {
 	private Vista vista;

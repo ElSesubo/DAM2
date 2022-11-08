@@ -1,5 +1,4 @@
-package AE02;
-
+package ejT2.AE02;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
@@ -8,20 +7,24 @@ import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 public class Model {
 	
-	public static boolean Conexion() {
-		boolean exito = false;
+	public static Connection Conexion() {
+		Connection con = null;
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dam2","root","");
-			exito = true;
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-		return exito;
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dam2","root","");
+		} catch (ClassNotFoundException ex) {
+            System.out.println(ex.getMessage() + 
+                    ". >>> Error de Conexion 1!!");
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage() + 
+                    ". >>> Error de Conexion 2!!");
+        }
+		return con;
 	}
 	
 	public static boolean comprobarLogin(String userN, String passN) {
@@ -29,8 +32,8 @@ public class Model {
 		try {
 			String user = "";
 			String pass = "";
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dam2","root","");
+
+			Connection con = Conexion();
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT * FROM users");
 			while(rs.next()) {
@@ -62,27 +65,46 @@ public class Model {
         return hashtext;
   }
     
-   public static void mostrarContingut(String tabla) {
+   public static int numColumnas(String tabla) {
+	   int cols = 0;
+	   try {
+			Connection con = Conexion();
+			Statement stmt = con.createStatement();
+			ResultSet nt = stmt.executeQuery("SELECT COUNT(*) FROM information_schema.columns WHERE TABLE_NAME='" + tabla + "'");
+			while(nt.next()) {
+				cols = nt.getInt(1);
+			}
+	   }catch(Exception e) {
+		   System.out.println(e);
+	   }
+	   return cols;
+   }
+    
+   public static void mostrarContingut(String tabla, int columnas) {
 	   try {
 		   	String infoTabla = "";
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dam2","root","");
+
+			Connection con = Conexion();
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT * FROM " + tabla);
-			ResultSet nt = stmt.executeQuery("SELECT COUNT(*) FROM information_schema.columns WHERE table_name = " + tabla);
-			int asd = nt.getInt(0);
 			//for(int i = 1; i < columnas; i++) {
 				
 			//}
 			while(rs.next()) {
-				infoTabla += " " + rs.getString(1);
-				infoTabla += " " + rs.getString(2);
-				infoTabla += " " + rs.getString(3);
-				infoTabla += " " + rs.getString(4);
-				infoTabla += " " + rs.getString(5);
-				infoTabla += " " + rs.getString(6);
-				infoTabla += "\n";
+				for(int i = 1; i <= columnas; i++) {
+					infoTabla += " " + rs.getString(i);
+					infoTabla += "\n";
+				}
 			}
+//			while(rs.next()) {
+//				infoTabla += " " + rs.getString(1);
+//				infoTabla += " " + rs.getString(2);
+//				infoTabla += " " + rs.getString(3);
+//				infoTabla += " " + rs.getString(4);
+//				infoTabla += " " + rs.getString(5);
+//				infoTabla += " " + rs.getString(6);
+//				infoTabla += "\n";
+//			}
 			System.out.println(infoTabla);
 	   }catch(Exception e) {
 		   System.out.println(e);
@@ -90,9 +112,9 @@ public class Model {
    }
    
    public static void main(String[] args) throws Exception {
-	   if(Conexion() == true) {
+	   if(Conexion() != null) {
 		   if(comprobarLogin("roberto", Encrypt("roberto")) == true) {
-			   mostrarContingut("titles");
+			   mostrarContingut("authors", numColumnas("authors"));
 		   }else {
 			   System.out.println("Error");
 		   }
