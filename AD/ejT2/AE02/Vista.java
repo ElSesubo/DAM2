@@ -9,65 +9,58 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JButton;
 import javax.swing.JTextField;
+import javax.swing.JLabel;
+import java.awt.Font;
+import javax.swing.JTable;
 
 public class Vista extends JFrame {
 
-	private JPanel contentPane;
-	private JTextField textField;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Vista frame = new Vista();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
-	 * Create the frame.
-	 */
+	JFrame frame;
+	JTextField textField;
+	JTextArea textArea;
+	JButton btnTancarConexio;
+	JButton btnMostrarInfo;
+	JButton btnRealitzarConsulta;
+	
 	public Vista() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 684, 537);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-
-		setContentPane(contentPane);
-		contentPane.setLayout(null);
+		initialize();
+	}
+	
+	private void initialize() {
+		frame = new JFrame();
+		frame.setBounds(100, 100, 633, 533);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(null);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(180, 103, 451, 355);
-		contentPane.add(scrollPane);
+		scrollPane.setBounds(195, 119, 391, 355);
+		frame.getContentPane().add(scrollPane);
 		
-		JTextArea textArea = new JTextArea();
+		textArea = new JTextArea();
 		scrollPane.setViewportView(textArea);
 		
-		JButton btnMostrarInfo = new JButton("Mostrar Informació");
-		btnMostrarInfo.setBounds(26, 103, 132, 41);
-		contentPane.add(btnMostrarInfo);
+		btnTancarConexio = new JButton("Tancar Conexió");
+		btnTancarConexio.setBounds(35, 436, 135, 38);
+		frame.getContentPane().add(btnTancarConexio);
 		
-		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(180, 34, 451, 46);
-		contentPane.add(scrollPane_1);
+		btnMostrarInfo = new JButton("Mostrar Info");
+		btnMostrarInfo.setBounds(35, 121, 135, 38);
+		frame.getContentPane().add(btnMostrarInfo);
+		
+		btnRealitzarConsulta = new JButton("Realitzar Consulta");
+		btnRealitzarConsulta.setBounds(35, 70, 135, 38);
+		frame.getContentPane().add(btnRealitzarConsulta);
 		
 		textField = new JTextField();
-		scrollPane_1.setViewportView(textField);
+		textField.setBounds(195, 70, 391, 38);
+		frame.getContentPane().add(textField);
 		textField.setColumns(10);
 		
-		JButton btnRealitarConsulta = new JButton("Realitzar consulta");
-		btnRealitarConsulta.setBounds(26, 34, 132, 41);
-		contentPane.add(btnRealitarConsulta);
+		JLabel lblNewLabel = new JLabel("CONSULTES A BASE DE DADES");
+		lblNewLabel.setFont(new Font("Century Gothic", Font.BOLD, 14));
+		lblNewLabel.setBounds(195, 26, 202, 14);
+		frame.getContentPane().add(lblNewLabel);
 		
-		JButton btnTancarConexi = new JButton("Tancar Conexió");
-		btnTancarConexi.setBounds(26, 417, 132, 41);
-		contentPane.add(btnTancarConexi);
+		this.frame.setVisible(true);
 	}
 }
