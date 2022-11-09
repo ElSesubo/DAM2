@@ -1,4 +1,4 @@
-package ejT2.AE02;
+package AE02;
 
 import java.awt.EventQueue;
 
@@ -21,6 +21,7 @@ public class Vista extends JFrame {
 	JButton btnTancarConexio;
 	JButton btnMostrarInfo;
 	JButton btnRealitzarConsulta;
+	JButton btnReconectar;
 	
 	public Vista() {
 		initialize();
@@ -60,6 +61,10 @@ public class Vista extends JFrame {
 		lblNewLabel.setFont(new Font("Century Gothic", Font.BOLD, 14));
 		lblNewLabel.setBounds(195, 26, 202, 14);
 		frame.getContentPane().add(lblNewLabel);
+		
+		btnReconectar = new JButton("Reconectar");
+		btnReconectar.setBounds(35, 170, 135, 38);
+		frame.getContentPane().add(btnReconectar);
 		
 		this.frame.setVisible(true);
 	}

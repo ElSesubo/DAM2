@@ -1,4 +1,4 @@
-package ejT2.AE02;
+package AE02;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
@@ -8,6 +8,7 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -24,7 +25,7 @@ import org.xml.sax.SAXException;
 
 public class Model {
 	
-	private static Connection conexion = null;
+	public static Connection conexion = null;
 	
 	public static Connection Conexion(String base, String usu, String pass) {
 		try {
@@ -40,8 +41,33 @@ public class Model {
 		return conexion;
 	}
 	
-	public static void realizarConsulta(String consulta) {
-		
+	public static String realizarCSelect(String consulta) {
+	   String infoTabla = "";
+	   try {
+			Statement stmt = conexion.createStatement();
+			ResultSet rs = stmt.executeQuery(consulta);
+
+			while(rs.next()) {
+				infoTabla += rs.getString("*") + "\n ";
+			}
+	   }catch(Exception e) {
+		   System.out.println(e);
+	   }
+	   return infoTabla;
+	}
+	
+	public static void realizarCIUD(String consulta) {
+		try {
+			PreparedStatement psInsertar = conexion.prepareStatement(consulta);
+			int resultadoInsertar = psInsertar.executeUpdate();
+			if(resultadoInsertar == 0) {
+				JOptionPane.showMessageDialog(null, "Error al ejecutar la consulta");
+			}
+			psInsertar.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public static boolean comprobarLogin(String userN, String passN) {

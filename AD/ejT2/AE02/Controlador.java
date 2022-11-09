@@ -1,4 +1,4 @@
-package ejT2.AE02;
+package AE02;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,11 +30,12 @@ public class Controlador {
 	}
 	
 	private void InitEventHandler() {
-		try {
-			login();
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		if(model.conexion == null) {
+			vista.btnTancarConexio.setEnabled(true);
+			vista.btnReconectar.setEnabled(false);
+		}else {
+			vista.btnTancarConexio.setEnabled(false);
+			vista.btnReconectar.setEnabled(true);
 		}
 		
 		ActionListener escucha = new ActionListener() {
@@ -51,7 +52,43 @@ public class Controlador {
 		
 		ActionListener cerrarS = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				vista.textArea.setText("");
 				model.cierraConexion();
+				if(model.conexion == null) {
+					vista.btnTancarConexio.setEnabled(true);
+					vista.btnReconectar.setEnabled(false);
+				}else {
+					vista.btnTancarConexio.setEnabled(false);
+					vista.btnReconectar.setEnabled(true);
+				}
+			}
+		};
+		
+		ActionListener abrirS = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				model.Conexion(null, null, null);
+				if(model.conexion == null) {
+					vista.btnTancarConexio.setEnabled(true);
+					vista.btnReconectar.setEnabled(false);
+				}else {
+					vista.btnTancarConexio.setEnabled(false);
+					vista.btnReconectar.setEnabled(true);
+				}
+			}
+		};
+		
+		ActionListener realizarConsulta = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String[] opciones = {"SELECT", "OTROS"};
+		        String tabla = (String)JOptionPane.showInputDialog(null, "Nom de la taula a visualitzar", 
+		                "Elegir taula", JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
+		        if(tabla.equals("SELECT")) {
+		        	vista.textArea.setText(model.realizarCSelect(vista.textField.getText()));
+		        	vista.textField.setText("");
+		        }else {
+		        	model.realizarCIUD(vista.textField.getText());
+		        	vista.textField.setText("");
+		        }
 			}
 		};
 		
@@ -59,7 +96,7 @@ public class Controlador {
 			String base = null, pass = null, user = null;
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			Document document = (Document) dBuilder.parse(new File("./usuarios.xml"));
+			Document document = (Document) dBuilder.parse(new File("./conexion.xml"));
 			NodeList nodeList = document.getElementsByTagName("conexion");
 			for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
@@ -72,10 +109,9 @@ public class Controlador {
 			}
 		   if(model.Conexion(base, user, pass) != null) {
 			   if(login() == true) {
+				   vista.btnRealitzarConsulta.addActionListener(realizarConsulta);
 				   vista.btnMostrarInfo.addActionListener(escucha);
 				   vista.btnTancarConexio.addActionListener(cerrarS);
-			   }else {
-				   login();
 			   }
 		   }else {
 			   JOptionPane.showMessageDialog(null, "Error al conectar amb la base de dades");
@@ -98,8 +134,8 @@ public class Controlador {
 		if (opcion == JOptionPane.OK_OPTION)
 		{
 		    String value1 = usu.getText();
-		    String value2 = pass.getText();
-		    if(model.comprobarLogin(value1, model.Encrypt(value2)) == false) {
+		    String value2 = model.Encrypt(pass.getText());
+		    if(model.comprobarLogin(value1, value2) == false) {
 		    	JOptionPane.showMessageDialog(null, "Contrasenya o usuari incorrectes");
 		    	login();
 		    }else {
