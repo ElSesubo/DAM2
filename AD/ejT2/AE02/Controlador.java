@@ -1,4 +1,4 @@
-package AE02;
+package ejT2.AE02;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -79,16 +79,17 @@ public class Controlador {
 		
 		ActionListener realizarConsulta = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String[] opciones = {"SELECT", "OTROS"};
-		        String tabla = (String)JOptionPane.showInputDialog(null, "Nom de la taula a visualitzar", 
-		                "Elegir taula", JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
-		        if(tabla.equals("SELECT")) {
-		        	vista.textArea.setText(model.realizarCSelect(vista.textField.getText()));
-		        	vista.textField.setText("");
-		        }else {
-		        	model.realizarCIUD(vista.textField.getText());
-		        	vista.textField.setText("");
-		        }
+				if(vista.textField.getText().equals("")) {
+					JOptionPane.showMessageDialog(null, "Camp buit");
+				}else {
+			        if(vista.textField.getText().contains("SELECT")) {
+			        	vista.textArea.setText(model.realizarCSelect(vista.textField.getText()));
+			        	vista.textField.setText("");
+			        }else {
+			        	model.realizarCIUD(vista.textField.getText());
+			        	vista.textField.setText("");
+			        }
+				}
 			}
 		};
 		
@@ -107,7 +108,7 @@ public class Controlador {
 					pass = eElement.getElementsByTagName("pass").item(0).getTextContent();
 				}
 			}
-		   if(model.Conexion(base, user, pass) != null) {
+			if(model.Conexion(base, user, pass) != null) {
 			   if(login() == true) {
 				   vista.btnRealitzarConsulta.addActionListener(realizarConsulta);
 				   vista.btnMostrarInfo.addActionListener(escucha);

@@ -1,4 +1,4 @@
-package AE02;
+package ejT2.AE02;
 
 import java.awt.EventQueue;
 

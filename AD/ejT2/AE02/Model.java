@@ -1,4 +1,4 @@
-package AE02;
+package ejT2.AE02;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
@@ -46,9 +46,14 @@ public class Model {
 	   try {
 			Statement stmt = conexion.createStatement();
 			ResultSet rs = stmt.executeQuery(consulta);
-
+			int columnas = rs.getMetaData().getColumnCount();
 			while(rs.next()) {
-				infoTabla += rs.getString("*") + "\n ";
+				for(int i = 1; i < columnas; i++) {
+					if(rs.getString(i).equals(rs.getString(1))) {
+						infoTabla += "\n ";
+					}
+					infoTabla += rs.getString(i) + " ";
+				}
 			}
 	   }catch(Exception e) {
 		   System.out.println(e);

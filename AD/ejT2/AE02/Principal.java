@@ -1,4 +1,4 @@
-package AE02;
+package ejT2.AE02;
 
 public class Principal {
 	public static void main(String[] args) {
