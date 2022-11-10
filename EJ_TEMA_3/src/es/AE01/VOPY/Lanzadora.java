@@ -1,33 +1,25 @@
-package EJ_TEMA_3.src.es.AE01;
+package AE01;
 
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
-import javax.swing.JTextField;
-import javax.swing.JComboBox;
-import javax.swing.JScrollPane;
-import javax.swing.JButton;
-import javax.swing.JTextArea;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-
-import java.awt.Font;
-import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JSpinner;
+import javax.swing.JButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 
 public class Lanzadora extends JFrame {
 
-	static int contador = 0;
 	private JPanel contentPane;
-	private static JTextField tfNumCroquetas;
-	static JComboBox cbTipoCroqueta;
-	JScrollPane scrollPane;
-	static JTextArea textArea;
+	ArrayList<Integer> cantidades = new ArrayList<Integer>();
+	ArrayList<String> tipos = new ArrayList<String>();
 
 	/**
 	 * Launch the application.
@@ -38,7 +30,6 @@ public class Lanzadora extends JFrame {
 				try {
 					Lanzadora frame = new Lanzadora();
 					frame.setVisible(true);
-					cargarComboBox();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -46,203 +37,78 @@ public class Lanzadora extends JFrame {
 		});
 	}
 	
-	private static Thread[] hilos;
-	
+	private static Thread[] hilos; 
+
+	/**
+	 * Create the frame.
+	 */
 	public Lanzadora() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 489, 393);
+		setBounds(100, 100, 450, 283);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		tfNumCroquetas = new JTextField();
-		tfNumCroquetas.setBounds(97, 66, 86, 20);
-		contentPane.add(tfNumCroquetas);
-		tfNumCroquetas.setColumns(10);
-		
-		cbTipoCroqueta = new JComboBox();
-		cbTipoCroqueta.setBounds(97, 97, 86, 22);
-		contentPane.add(cbTipoCroqueta);
-		
-		scrollPane = new JScrollPane();
-		scrollPane.setBounds(209, 66, 239, 259);
-		contentPane.add(scrollPane);
-		
-		textArea = new JTextArea();
-		textArea.setEditable(false);
-		scrollPane.setViewportView(textArea);
-		
-		JButton btnVaciar = new JButton("Vuidar");
-		btnVaciar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				textArea.setText("");
-			}
-		});
-		scrollPane.setColumnHeaderView(btnVaciar);
-		
-		JButton btnNewButton = new JButton("Fabricar");
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(comprobarCampos() == true) {
-					contador = 0;
-					
-					int numHilos = Integer.parseInt(tfNumCroquetas.getText());
-					String tipo = (String) cbTipoCroqueta.getSelectedItem();
-					hilos = new Thread[numHilos];
-					Procesadora pro;
-					for(int i = 0; i < numHilos; i++) {
-						pro = new Procesadora(numHilos, tipo);
-						hilos[i] = new Thread(pro);
-						hilos[i].start();
-//						try {
-//							hilos[i].join();
-//						} catch (Exception ex) {
-//							System.out.println(ex);
-//						}
-					}
-				}else {
-					JOptionPane.showMessageDialog(null, "Numero de croquetas máximos sobrepasados");
-				}
-			}
-		});
-		btnNewButton.setBounds(42, 293, 141, 32);
-		contentPane.add(btnNewButton);
-		
-		JLabel lblNewLabel = new JLabel("FABRICADOR DE CROQUETAS");
-		lblNewLabel.setFont(new Font("Century Gothic", Font.BOLD, 15));
-		lblNewLabel.setBounds(121, 26, 274, 14);
+		JLabel lblNewLabel = new JLabel("Tipo:");
+		lblNewLabel.setBounds(27, 52, 46, 14);
 		contentPane.add(lblNewLabel);
 		
-		JLabel lblNewLabel_1 = new JLabel("Cantidad:");
-		lblNewLabel_1.setBounds(42, 69, 55, 14);
-		contentPane.add(lblNewLabel_1);
+		JLabel lblCantidad = new JLabel("Cantidad:");
+		lblCantidad.setBounds(27, 86, 57, 14);
+		contentPane.add(lblCantidad);
 		
-		JLabel lblNewLabel_1_1 = new JLabel("Tipo:");
-		lblNewLabel_1_1.setBounds(42, 101, 46, 14);
-		contentPane.add(lblNewLabel_1_1);
+		JComboBox cbTipo = new JComboBox();
+		cbTipo.setBounds(58, 48, 77, 22);
+		contentPane.add(cbTipo);
 		
-		JComboBox cbTipoCroqueta_1 = new JComboBox();
-		cbTipoCroqueta_1.setBounds(97, 158, 86, 22);
-		contentPane.add(cbTipoCroqueta_1);
+		JSpinner spCantidad = new JSpinner();
+		spCantidad.setBounds(78, 83, 57, 20);
+		contentPane.add(spCantidad);
 		
-		JCheckBox chckbxNewCheckBox = new JCheckBox("Personalizar Prioridad");
-		chckbxNewCheckBox.setBounds(42, 128, 157, 23);
-		contentPane.add(chckbxNewCheckBox);
-		
-		JComboBox cbTipoCroqueta_1_1 = new JComboBox();
-		cbTipoCroqueta_1_1.setBounds(97, 191, 86, 22);
-		contentPane.add(cbTipoCroqueta_1_1);
-		
-		JComboBox cbTipoCroqueta_1_2 = new JComboBox();
-		cbTipoCroqueta_1_2.setBounds(97, 224, 86, 22);
-		contentPane.add(cbTipoCroqueta_1_2);
-		
-		JComboBox cbTipoCroqueta_1_3 = new JComboBox();
-		cbTipoCroqueta_1_3.setBounds(97, 257, 86, 22);
-		contentPane.add(cbTipoCroqueta_1_3);
-		
-		JLabel lblNewLabel_1_1_1_3 = new JLabel("4:");
-		lblNewLabel_1_1_1_3.setBounds(74, 261, 16, 14);
-		contentPane.add(lblNewLabel_1_1_1_3);
-		
-		JLabel lblNewLabel_1_1_1_3_1 = new JLabel("1:");
-		lblNewLabel_1_1_1_3_1.setBounds(74, 162, 16, 14);
-		contentPane.add(lblNewLabel_1_1_1_3_1);
-		
-		JLabel lblNewLabel_1_1_1_3_2 = new JLabel("2:");
-		lblNewLabel_1_1_1_3_2.setBounds(74, 195, 16, 14);
-		contentPane.add(lblNewLabel_1_1_1_3_2);
-		
-		JLabel lblNewLabel_1_1_1_3_3 = new JLabel("3:");
-		lblNewLabel_1_1_1_3_3.setBounds(74, 228, 16, 14);
-		contentPane.add(lblNewLabel_1_1_1_3_3);
-	}
-	
-	public static class Procesadora implements Runnable {
-		private int numCroquetas;
-		private String tipoCroqueta;
-		
-		public Procesadora(int numCroquetas, String tipoCroqueta) {
-			this.numCroquetas = numCroquetas;
-			this.tipoCroqueta = tipoCroqueta;
-		}
-		
-		public int getNumCroquetas() {
-			return numCroquetas;
-		}
-
-		public void setNumCroquetas(int numCroquetas) {
-			this.numCroquetas = numCroquetas;
-		}
-
-		public String getTipoCroqueta() {
-			return tipoCroqueta;
-		}
-
-		public void setTipoCroqueta(String tipoCroqueta) {
-			this.tipoCroqueta = tipoCroqueta;
-		}
-		
-		public void crearCroqueta(int num, String tipo) {
-			try {
-				if(num == 100) {
-					Thread.sleep(3000);
-				}
-				switch (tipo) {
-					case "jamón":
-						contador++;
-						textArea.append("\nCreando croqueta de jamón n." + contador);
-						Thread.sleep(5000);
-						textArea.append("\nCroqueta de jamón finalizada");
-					break;
-					case "pollo":
-						contador++;
-						textArea.append("\nCreando croqueta de pollo n." + contador);
-						Thread.sleep(6000);
-						textArea.append("\nCroqueta de pollo finalizada");
-					break;
-					case "bacalao":
-						contador++;
-						textArea.append("\nCreando croqueta de bacalao n." + contador);
-						Thread.sleep(5000);
-						textArea.append("\nCroqueta de bacalao finalizada");
-					break;
-					case "queso":
-						contador++;
-						textArea.append("\nCreando croqueta de queso n." + contador);
-						Thread.sleep(5000);
-						textArea.append("\nCroqueta de queso finalizada");
-					break;		
-				}
-			}catch(InterruptedException e) {
-				e.printStackTrace();
+		JButton btnAnadir = new JButton("Añadir");
+		btnAnadir.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int cant = (Integer) spCantidad.getValue();
+				String tipo = (String) cbTipo.getSelectedItem();
+				cantidades.add(cant);
+				tipos.add(tipo);
 			}
-		}
+		});
+		btnAnadir.setBounds(38, 206, 89, 23);
+		contentPane.add(btnAnadir);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(149, 47, 263, 150);
+		contentPane.add(scrollPane);
+		
+		JTextArea textArea = new JTextArea();
+		scrollPane.setViewportView(textArea);
+		
+		JButton btnFabricar = new JButton("Fabricar");
+		btnFabricar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int numHilos = 0;
+				for(int i = 0; i < cantidades.size(); i++) {
+					numHilos += cantidades.get(i);
+				}
+				hilos = new Thread[numHilos];
+				Procesadora pro;
+				for(int i = 0; i < numHilos; i++) {
+					pro = new Procesadora(cantidades.get(i), tipos.get(i), numHilos);
+					hilos[i] = new Thread(pro);
+					hilos[i].start();
+//					try {
+//						hilos[i].join();
+//					} catch (Exception ex) {
+//						System.out.println(ex);
+//					}
+				}
+			}
+		});
+		btnFabricar.setBounds(323, 206, 89, 23);
+		contentPane.add(btnFabricar);
+	}
 
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			int numHilos = Integer.parseInt(tfNumCroquetas.getText());
-			String tipo = (String) cbTipoCroqueta.getSelectedItem();
-			crearCroqueta(numHilos, tipo);
-		}
-	}
-	
-	public static void cargarComboBox() {
-		cbTipoCroqueta.addItem("jamón");
-		cbTipoCroqueta.addItem("pollo");
-		cbTipoCroqueta.addItem("bacalao");
-		cbTipoCroqueta.addItem("queso");
-	}
-	
-	public boolean comprobarCampos() {
-		boolean continuar = true;
-		int cantidad = Integer.parseInt(tfNumCroquetas.getText());
-		if(cantidad > 100) {
-			continuar = false;
-		}
-		return continuar;
-	}
 }
