@@ -31,12 +31,8 @@ public class Model {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			conexion = DriverManager.getConnection(base,usu,pass);
-		} catch (ClassNotFoundException ex) {
-            System.out.println(ex.getMessage() + 
-                    ". >>> Error de Conexion 1!!");
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage() + 
-                    ". >>> Error de Conexion 2!!");
+		} catch (ClassNotFoundException | SQLException ex ) {
+            JOptionPane.showMessageDialog(null, "Error al conectarse a la base de dades");
         }
 		return conexion;
 	}
@@ -49,14 +45,14 @@ public class Model {
 			int columnas = rs.getMetaData().getColumnCount();
 			while(rs.next()) {
 				for(int i = 1; i < columnas; i++) {
-					if(rs.getString(i).equals(rs.getString(1))) {
+					infoTabla += rs.getString(i) + " ";
+					if(i == columnas) {
 						infoTabla += "\n ";
 					}
-					infoTabla += rs.getString(i) + " ";
 				}
 			}
 	   }catch(Exception e) {
-		   System.out.println(e);
+		   JOptionPane.showMessageDialog(null, "Error al executar la consulta");
 	   }
 	   return infoTabla;
 	}
@@ -66,12 +62,12 @@ public class Model {
 			PreparedStatement psInsertar = conexion.prepareStatement(consulta);
 			int resultadoInsertar = psInsertar.executeUpdate();
 			if(resultadoInsertar == 0) {
-				JOptionPane.showMessageDialog(null, "Error al ejecutar la consulta");
+				JOptionPane.showMessageDialog(null, "Error al executar la consulta");
 			}
 			psInsertar.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Error al executar la consulta");
 		}
 	}
 	
@@ -163,10 +159,10 @@ public class Model {
 
 			while(rs.next()) {
 				for(int i = 1; i <= columnas; i++) {
-					if(rs.getString(i).equals(rs.getString(1))) {
-						infoTabla += "\n";
-					}
 					infoTabla += rs.getString(i) + " ";
+					if(i == columnas) {
+						infoTabla += "\n";
+					}	
 				}
 			}
 	   }catch(Exception e) {

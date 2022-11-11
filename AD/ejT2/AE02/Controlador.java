@@ -17,6 +17,7 @@ import org.w3c.dom.NodeList;
 public class Controlador {
 	private static Vista vista;
 	private static Model model;
+	public static String base = null, pass = null, user = null;
 	
 	public Controlador(Vista vista, Model model) {
 		this.vista = vista;
@@ -55,24 +56,25 @@ public class Controlador {
 				vista.textArea.setText("");
 				model.cierraConexion();
 				if(model.conexion == null) {
-					vista.btnTancarConexio.setEnabled(true);
-					vista.btnReconectar.setEnabled(false);
+					vista.btnTancarConexio.setEnabled(false);
+					vista.btnReconectar.setEnabled(true);
 				}else {
 					vista.btnTancarConexio.setEnabled(false);
 					vista.btnReconectar.setEnabled(true);
+					vista.btnMostrarInfo.setEnabled(false);
+					vista.btnRealitzarConsulta.setEnabled(false);
 				}
 			}
 		};
 		
 		ActionListener abrirS = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				model.Conexion(null, null, null);
-				if(model.conexion == null) {
+				if(model.Conexion(base, user, pass) != null) {
 					vista.btnTancarConexio.setEnabled(true);
 					vista.btnReconectar.setEnabled(false);
-				}else {
-					vista.btnTancarConexio.setEnabled(false);
-					vista.btnReconectar.setEnabled(true);
+					vista.btnMostrarInfo.setEnabled(true);
+					vista.btnRealitzarConsulta.setEnabled(true);
+					JOptionPane.showMessageDialog(null, "Conexió oberta");
 				}
 			}
 		};
@@ -94,7 +96,6 @@ public class Controlador {
 		};
 		
 		try {
-			String base = null, pass = null, user = null;
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			Document document = (Document) dBuilder.parse(new File("./conexion.xml"));
@@ -109,11 +110,13 @@ public class Controlador {
 				}
 			}
 			if(model.Conexion(base, user, pass) != null) {
-			   if(login() == true) {
-				   vista.btnRealitzarConsulta.addActionListener(realizarConsulta);
-				   vista.btnMostrarInfo.addActionListener(escucha);
-				   vista.btnTancarConexio.addActionListener(cerrarS);
-			   }
+			   vista.btnRealitzarConsulta.addActionListener(realizarConsulta);
+			   vista.btnMostrarInfo.addActionListener(escucha);
+			   vista.btnTancarConexio.addActionListener(cerrarS);
+			   vista.btnReconectar.addActionListener(abrirS);
+				do {
+					
+				}while(login() == false);
 		   }else {
 			   JOptionPane.showMessageDialog(null, "Error al conectar amb la base de dades");
 		   }
@@ -132,19 +135,18 @@ public class Controlador {
 				"Contrasenya: ", pass
 		};   		
 		int opcion = JOptionPane.showConfirmDialog(null,fields,"Iniciar sesió",JOptionPane.OK_CANCEL_OPTION);
-		if (opcion == JOptionPane.OK_OPTION)
-		{
-		    String value1 = usu.getText();
-		    String value2 = model.Encrypt(pass.getText());
-		    if(model.comprobarLogin(value1, value2) == false) {
-		    	JOptionPane.showMessageDialog(null, "Contrasenya o usuari incorrectes");
-		    	login();
-		    }else {
-		    	correcte = true;
-		    }
-		}else {
-			System.exit(0);
-		}
+			if (opcion == JOptionPane.OK_OPTION)
+			{
+			    String value1 = usu.getText();
+			    String value2 = model.Encrypt(pass.getText());
+			    if(model.comprobarLogin(value1, value2) == false) {
+			    	JOptionPane.showMessageDialog(null, "Contrasenya o usuari incorrectes");
+			    }else {
+			    	correcte = true;
+			    }
+			}else {
+				System.exit(0);
+			}
 		return correcte;
 	}
 }
