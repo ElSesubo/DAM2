@@ -1,86 +1,82 @@
 package AE01;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.swing.JOptionPane;
 
-public class Procesadora implements Runnable {
+import AE01.Croqueta;
 
-	private int cantidad;
-	private String tipo;
-	private int numTotal;
-	
-	public Procesadora(int cantidad, String tipo,int numTotal) {
-		this.cantidad = cantidad;
-		this.tipo = tipo;
-		this.numTotal = numTotal;
-	}
-	
-	public int getCantidad() {
-		return cantidad;
-	}
-
-	public void setCantidad(int cantidad) {
-		this.cantidad = cantidad;
-	}
-
-	public String getTipo() {
-		return tipo;
-	}
-
-	public void setTipo(String tipo) {
-		this.tipo = tipo;
-	}
-
-	public int getNumTotal() {
-		return numTotal;
-	}
-
-	public void setNumTotal(int numTotal) {
-		this.numTotal = numTotal;
-	}
-	
-	public String crearCroqueta(Procesadora pro) {
-		String mensaje = "";
-		try {
-			if(pro.getNumTotal() <= 100) {
-				switch (pro.getTipo()) {
-					case "jamón":
-						mensaje += "Creando croqueta de jamón";
-						Thread.sleep(5000);
-						mensaje += "Croqueta de jamón finalizada";
-					break;
-					case "pollo":
-						mensaje += "Creando croqueta de pollo";
-						Thread.sleep(6000);
-						mensaje += "Croqueta de pollo finalizada";
-					break;
-					case "bacalao":
-						mensaje += "Creando croqueta de bacalao";
-						Thread.sleep(7000);
-						mensaje += "Croqueta de bacalao finalizada";
-					break;	
-					case "queso":
-						mensaje += "Creando croqueta de queso";
-						Thread.sleep(8000);
-						mensaje += "Croqueta de queso finalizada";
-					break;	
-				}
-			}else {
-				JOptionPane.showMessageDialog(null, "Numero de hilos máximos sobrepasados");
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		return mensaje;
-	}
-
+public class Procesadora {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		long startTime = System.nanoTime();
 
+		int croquetaJamon = Integer.parseInt(args[0]);
+		int croquetaPollo = Integer.parseInt(args[1]);
+		int croquetaQueso = Integer.parseInt(args[2]);
+		int croquetaBacalao = Integer.parseInt(args[3]);
+		String prioridad = args[4];
+		Thread hilo;
+
+		int totalHilos = croquetaJamon + croquetaPollo + croquetaQueso + croquetaBacalao;
+
+//		if (totalHilos > 100) {
+//			do {
+//				System.out.println("Numero maximo de hilos alcanzado. Hilos actuales: " + totalHilos);
+//				try {
+//					Thread.sleep(3000);
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			} while (totalHilos > 100);
+//		}
+		
+		switch (prioridad) {
+			case "jamón":
+				totalHilos = hacerHilos(croquetaJamon, "jamón", totalHilos);
+				break;
+				
+			case "pollo":
+				totalHilos = hacerHilos(croquetaPollo, "pollo", totalHilos);
+				break;
+	
+			case "bacalao":
+				totalHilos = hacerHilos(croquetaBacalao, "bacalao", totalHilos);
+				break;
+	
+			case "queso":
+				totalHilos = hacerHilos(croquetaQueso, "queso", totalHilos);
+				break;
+			}
+		
+		totalHilos = hacerHilos(croquetaJamon, "jamón", totalHilos);
+		totalHilos = hacerHilos(croquetaPollo, "pollo", totalHilos);
+		totalHilos = hacerHilos(croquetaBacalao, "bacalao", totalHilos);
+		totalHilos = hacerHilos(croquetaQueso, "queso", totalHilos);
+
+		long endTime = System.nanoTime();
+		long totalTime = endTime - startTime;
+		long total = TimeUnit.SECONDS.convert(totalTime, TimeUnit.NANOSECONDS);
+
+		JOptionPane.showMessageDialog(null, "Tiempo total de fabricación: " + total + " segundos");
 	}
-
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
+	
+	public static int hacerHilos(int cant, String nombre, int totalHilos) {
+		Thread hilo;
+		for (int i = 1; i <= cant; i++) {
+			Croqueta c = new Croqueta(nombre);
+			hilo = new Thread(c);
+			hilo.start();
+			try {
+				hilo.join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			totalHilos--;
+		}
+		return totalHilos;
 	}
 
 }
