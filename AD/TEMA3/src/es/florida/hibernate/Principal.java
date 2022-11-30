@@ -31,17 +31,31 @@ public class Principal {
 		//Ací les operacio/ns CRUD (crear, llegir, actualitzar, borrar)
 		
 		//Crear nou objecte
-//		User us = new User("manute", "mama");
-//		Serializable id = session.save(us);
+		User us = new User("manute", "mama");
+		Serializable id = session.save(us);
 		
 		//Recuperar llista d’objectes
 		List listaCanciones = new ArrayList();
 		listaCanciones = session.createQuery("FROM User").list();
+		for(int i = 0; i < listaCanciones.size(); i++) {
+			User u = (User) listaCanciones.get(i);
+			System.out.println(u.toString());
+		}
 		
 		//Recuperar un objecte a partir del seu id
 		User user = (User) session.get(User.class, 1);
 		System.out.println(user.getId() + " " + user.getUser() + " " + user.getPass());
 
+		// Actualitza la información d’un objecte donat el seu id
+		User us1 = (User) session.load(User.class, 5);
+		us1.setUser("manute");
+		us1.setPass("MP3");
+		session.update(us1);
+
+		//Borrar un objecte donat el seu id
+		User us2 = new User();
+		us2.setId(5);
+		session.delete(us2);
 		
 		//Commit de la transacció i tanca de sessió
 		session.getTransaction().commit();
