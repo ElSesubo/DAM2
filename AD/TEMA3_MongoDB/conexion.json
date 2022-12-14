@@ -2,5 +2,12 @@
 	"ip": "localhost",
 	"port": 27017,
 	"database": "damMongoDB",
-	"collection": "Llibres"
+	"collections":[
+		{
+			"collection": "Llibres"
+		}
+		{
+			"collection": "Usuaris"
+		}
+	]
 }
