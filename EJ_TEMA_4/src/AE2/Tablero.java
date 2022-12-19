@@ -25,7 +25,7 @@ public class Tablero implements Runnable {
 		this.socket = socket;
 	}
 	
-	private boolean inicio() {
+	private boolean iniciarParImpar() {
 		int numeroRand = (int) (Math.random()*1);
 		boolean acierto = false;
 		InputStream is;
@@ -35,15 +35,15 @@ public class Tablero implements Runnable {
 			InputStreamReader isr = new InputStreamReader(is);
 			BufferedReader bf = new BufferedReader(isr);
 			parImpar = bf.readLine();
-			System.err.println(parImpar);
+			System.out.println(numeroRand);
 			if(Integer.parseInt(parImpar)%2 == 1 && numeroRand%2 == 1) {
-				JOptionPane.showMessageDialog(null, "Acertastes");
+				JOptionPane.showMessageDialog(null, "Comienzas tu");
 				acierto = true;
 			} else if(Integer.parseInt(parImpar)%2 == 0 && numeroRand%2 == 0) {
-				JOptionPane.showMessageDialog(null, "Acertastes");
+				JOptionPane.showMessageDialog(null, "Comienzas tu");
 				acierto = true;
 			}else {
-				JOptionPane.showMessageDialog(null, "Fallastes");
+				JOptionPane.showMessageDialog(null, "Comienza la máquina");
 				acierto = false;
 			}
 		} catch (IOException e) {
@@ -57,7 +57,7 @@ public class Tablero implements Runnable {
 		comprobar();
 	}
 	
-	private int pintar() {
+	private int ocuparPosicion() {
 		int casilla = (int) (Math.random() * 8);
 		while (btns[casilla] != "") {
 			casilla = (int) (Math.random() * 8);
@@ -89,29 +89,31 @@ public class Tablero implements Runnable {
 			pw = new PrintWriter(os);
 			boolean cerrar= false;
 			String turnoCliente = "";
-			if(inicio()) {
-				while(!cerrar) {
-					System.err.println("SERVIDOR >>> Lee datos para la operacion");
-					int num1 = Integer.parseInt(bfr.readLine());
-					System.err.println("SERVIDOR >>> Comprueba los espacios");
-					recibirPosicion(num1);
-					int numEnviar = pintar();
-					System.err.println("SERVIDOR >>> Devuelve resultado");
-					pw.write(String.valueOf(numEnviar) + "\n");
-					pw.flush();
+			while(true) {
+				if(iniciarParImpar()) {
+					while(!cerrar) {
+						System.err.println("SERVIDOR >>> Lee datos para la operacion");
+						int num1 = Integer.parseInt(bfr.readLine());
+						System.err.println("SERVIDOR >>> Comprueba los espacios");
+						recibirPosicion(num1);
+						int numEnviar = ocuparPosicion();
+						System.err.println("SERVIDOR >>> Devuelve resultado");
+						pw.write(String.valueOf(numEnviar) + "\n");
+						pw.flush();
+					}
+				}else {
+					while(!cerrar) {
+						int numEnviar = ocuparPosicion();
+						System.err.println("SERVIDOR >>> Da resultado");
+						pw.write(String.valueOf(numEnviar) + "\n");
+						pw.flush();
+						turnoCliente = bfr.readLine();
+						System.err.println("Posicion cliente" + turnoCliente);
+						recibirPosicion(Integer.valueOf(turnoCliente));
+					}
 				}
-			}else {
-				while(!cerrar) {
-					int numEnviar = pintar();
-					System.err.println("SERVIDOR >>> Da resultado");
-					pw.write(String.valueOf(numEnviar) + "\n");
-					pw.flush();
-					turnoCliente = bfr.readLine();
-					System.err.println("Posicion cliente" + turnoCliente);
-					recibirPosicion(Integer.valueOf(turnoCliente));
-				}
+				socket.close();
 			}
-			socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		System.err.println("SERVIDOR >>> Error.");

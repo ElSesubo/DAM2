@@ -51,7 +51,6 @@ public class Cliente extends JFrame {
 			{1,5,9},
 			{3,5,7}
 	};
-	private JButton btnRefrescar;
 
 	/**
 	 * Launch the application.
@@ -66,6 +65,12 @@ public class Cliente extends JFrame {
 					Cliente frame = new Cliente(socket);
 					frame.setVisible(true);
 					frame.enviarParImpar(socket);
+					do {
+						frame.presionar(ABORT, socket);
+						if(frame.ganador) {
+							frame.recibirInfo(socket);
+						}
+					}while(!frame.ganador);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -235,17 +240,101 @@ public class Cliente extends JFrame {
 		btns[6] = btnP7;
 		btns[7] = btnP8;
 		btns[8] = btnP9;
-		
-		btnRefrescar = new JButton("Nueva partida");
-		btnRefrescar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				limpiarControles();
-			}
-		});
-		btnRefrescar.setBounds(24, 11, 101, 29);
-		contentPane.add(btnRefrescar);
 		limpiarControles();
 	}
+	
+//	public void initEventHandler(Socket socket) {
+//		btnP1.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				try {
+//					presionar(1,socket);
+//				} catch (IOException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
+//			}
+//		});
+//		btnP2.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				try {
+//					presionar(2,socket);
+//				} catch (IOException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
+//			}
+//		});
+//		btnP3.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				try {
+//					presionar(3,socket);
+//				} catch (IOException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
+//			}
+//		});
+//		btnP4.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				try {
+//					presionar(4,socket);
+//				} catch (IOException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
+//			}
+//		});
+//		btnP5.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				try {
+//					presionar(5,socket);
+//				} catch (IOException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
+//			}
+//		});
+//		btnP6.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				try {
+//					presionar(6,socket);
+//				} catch (IOException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
+//			}
+//		});
+//		btnP7.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				try {
+//					presionar(7,socket);
+//				} catch (IOException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
+//			}
+//		});
+//		btnP8.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				try {
+//					presionar(8,socket);
+//				} catch (IOException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
+//			}
+//		});
+//		btnP9.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				try {
+//					presionar(9,socket);
+//				} catch (IOException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
+//			}
+//		});
+//	}
 	
 	public void presionar(int casilla, Socket socket) throws IOException {
 		if(btns[casilla-1].getText().equals("")) {
@@ -292,7 +381,7 @@ public class Cliente extends JFrame {
 		try {
 			os = socket.getOutputStream();
 			PrintWriter pw = new PrintWriter(os);
-			System.err.println(selection);
+			System.out.println(selection);
 			pw.write(String.valueOf(selection) + "\n");
 			pw.flush();	
 		} catch (IOException e) {
@@ -326,6 +415,8 @@ public class Cliente extends JFrame {
 				ganador = true;
 				JOptionPane.showMessageDialog(null,"Gana la maquina");
 			}
+			
+			
 		}
 	}
 	
