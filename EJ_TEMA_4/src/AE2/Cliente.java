@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -15,8 +16,6 @@ import java.net.Socket;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
-import es.florida.ej.Libro;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -38,6 +37,7 @@ public class Cliente extends JFrame {
 	private JButton btnP8;
 	private JButton btnP9;
 	
+	private boolean ganador = false;
 	private JPanel contentPane;
 	private String turno = "X";
 	private JButton btns[] = new JButton[9];
@@ -65,8 +65,7 @@ public class Cliente extends JFrame {
 					socket.connect(direccion);
 					Cliente frame = new Cliente(socket);
 					frame.setVisible(true);
-					
-					
+					frame.enviarParImpar(socket);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -222,15 +221,6 @@ public class Cliente extends JFrame {
 		btnP9.setBounds(298, 270, 89, 89);
 		contentPane.add(btnP9);
 		
-		JButton btnSalir = new JButton("Salir");
-		btnSalir.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-			}
-		});
-		btnSalir.setBounds(397, 344, 72, 29);
-		contentPane.add(btnSalir);
-		
 		JLabel lblNewLabel = new JLabel("TRES EN RAYA");
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		lblNewLabel.setBounds(173, 21, 119, 14);
@@ -260,34 +250,54 @@ public class Cliente extends JFrame {
 	public void presionar(int casilla, Socket socket) throws IOException {
 		if(btns[casilla-1].getText().equals("")) {
 			btns[casilla-1].setText(turno);
-			cambiarTurno();
 			
-			System.out.println("Enviando datos al servidor");
+			System.err.println("Enviando datos al servidor");
 			// Enviando datos al servidor
 			PrintWriter pw = new PrintWriter(socket.getOutputStream());
 			pw.print(String.valueOf(casilla-1) + "\n");
 			pw.flush();
 			
-			comprobarGanador();
-		}
-	}
-	
-	public void presionar(int casilla) throws IOException {
-		if(btns[casilla-1].getText().equals("")) {
-			btns[casilla-1].setText(turno);
 			cambiarTurno();
 			comprobarGanador();
+			
+			recibirInfo(socket);
 		}
 	}
 	
 	public void recibirInfo(Socket socket) throws NumberFormatException, IOException {
-		System.out.println("Recibiendo datos del servidor");
-		// Recibiendo datos del servidor
-		InputStream is = socket.getInputStream();
-		InputStreamReader isr = new InputStreamReader(is);
-		BufferedReader bfr = new BufferedReader(isr);
-		int resultado = Integer.parseInt(bfr.readLine());
-		presionar(resultado);
+		System.err.println("Recibiendo datos del servidor");
+		try {
+			InputStream is = socket.getInputStream();
+			InputStreamReader isr = new InputStreamReader(is);
+			BufferedReader bf = new BufferedReader(isr);
+			int turnoServidor = Integer.parseInt(bf.readLine());
+			System.err.println(String.valueOf(turnoServidor));
+			if(!ganador) {
+				if(btns[turnoServidor].getText().equals("")) {
+					btns[turnoServidor].setText(turno);
+					cambiarTurno();
+					comprobarGanador();
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void enviarParImpar(Socket socket) {
+		String[] opciones = { "Par", "Impar" };
+        int selection = JOptionPane.showOptionDialog(null, "¿Número par o impar?:", "Comienza el Juego", 0, 3, null,
+                opciones, opciones[0]);
+		OutputStream os;
+		try {
+			os = socket.getOutputStream();
+			PrintWriter pw = new PrintWriter(os);
+			System.err.println(selection);
+			pw.write(String.valueOf(selection) + "\n");
+			pw.flush();	
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void cambiarTurno() {
@@ -305,6 +315,7 @@ public class Cliente extends JFrame {
 				btns[validacion[i][0]-1].setBackground(Color.green);
 				btns[validacion[i][1]-1].setBackground(Color.green);
 				btns[validacion[i][2]-1].setBackground(Color.green);
+				ganador = true;
 				JOptionPane.showMessageDialog(null,"Gana el jugador");
 			}
 			if(btns[validacion[i][0]-1].getText().equals("O") && btns[validacion[i][1]-1].getText().equals("O") && btns[validacion[i][2]-1].getText().equals("O")) {
@@ -312,6 +323,7 @@ public class Cliente extends JFrame {
 				btns[validacion[i][0]-1].setBackground(Color.red);
 				btns[validacion[i][1]-1].setBackground(Color.red);
 				btns[validacion[i][2]-1].setBackground(Color.red);
+				ganador = true;
 				JOptionPane.showMessageDialog(null,"Gana la maquina");
 			}
 		}
@@ -329,5 +341,6 @@ public class Cliente extends JFrame {
 			btns[i].setEnabled(true);
 			btns[i].setBackground(Color.white);
 		}
+		ganador = false;
 	}
 }

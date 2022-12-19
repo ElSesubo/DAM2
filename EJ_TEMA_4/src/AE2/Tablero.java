@@ -12,31 +12,70 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.JButton;
-
-import es.florida.ej.Libro;
+import javax.swing.JOptionPane;
 
 public class Tablero implements Runnable {
 	
 	BufferedReader bfr;
 	PrintWriter pw;
-	private String btns[] = {"","","","","","","","",""};
+	String btns[] = { "","","","","","","","","" };
 	Socket socket;
 	
 	public Tablero(Socket socket) {
 		this.socket = socket;
 	}
 	
-	public int comprobarPosiciones(int pos) {
-		List<String> lista = Arrays.asList(btns);
-		int posRandom = (int) (Math.random()*8);
-		if(lista.contains("")) {
-			while(!btns[posRandom].equals("")) {
-				posRandom = (int) (Math.random()*8);
+	private boolean inicio() {
+		int numeroRand = (int) (Math.random()*1);
+		boolean acierto = false;
+		InputStream is;
+		String parImpar = "";
+		try {
+			is = socket.getInputStream();
+			InputStreamReader isr = new InputStreamReader(is);
+			BufferedReader bf = new BufferedReader(isr);
+			parImpar = bf.readLine();
+			System.err.println(parImpar);
+			if(Integer.parseInt(parImpar)%2 == 1 && numeroRand%2 == 1) {
+				JOptionPane.showMessageDialog(null, "Acertastes");
+				acierto = true;
+			} else if(Integer.parseInt(parImpar)%2 == 0 && numeroRand%2 == 0) {
+				JOptionPane.showMessageDialog(null, "Acertastes");
+				acierto = true;
+			}else {
+				JOptionPane.showMessageDialog(null, "Fallastes");
+				acierto = false;
 			}
-			btns[posRandom] = "ocupado";
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		return posRandom;
+		return acierto;
+	}
+	
+	private void recibirPosicion(int pos) {
+		btns[pos] = "X";
+		comprobar();
+	}
+	
+	private int pintar() {
+		int casilla = (int) (Math.random() * 8);
+		while (btns[casilla] != "") {
+			casilla = (int) (Math.random() * 8);
+		}
+		if (btns[casilla].equals("")) {
+			btns[casilla] = "O";
+		}
+		comprobar();
+		return casilla;
+	}
+
+	private boolean comprobar() {
+		List<String> list = Arrays.asList(btns);
+		if (list.contains("")) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 	
 	@Override
@@ -48,19 +87,34 @@ public class Tablero implements Runnable {
 			bfr = new BufferedReader(isr);
 			OutputStream os = socket.getOutputStream();
 			pw = new PrintWriter(os);
-			System.err.println("SERVIDOR >>> Lee datos para la operacion");
-			System.out.println(bfr.readLine());
-			int num1 = Integer.parseInt(bfr.readLine());
-			System.err.println("SERVIDOR >>> Comprueba los espacios");
-			int numEnviar = comprobarPosiciones(num1);
-			System.err.println("SERVIDOR >>> Devuelve resultado");
-			pw.write(numEnviar);
-			pw.flush();
-			System.err.println("SERVIDOR >>> Espera nueva peticion");
+			boolean cerrar= false;
+			String turnoCliente = "";
+			if(inicio()) {
+				while(!cerrar) {
+					System.err.println("SERVIDOR >>> Lee datos para la operacion");
+					int num1 = Integer.parseInt(bfr.readLine());
+					System.err.println("SERVIDOR >>> Comprueba los espacios");
+					recibirPosicion(num1);
+					int numEnviar = pintar();
+					System.err.println("SERVIDOR >>> Devuelve resultado");
+					pw.write(String.valueOf(numEnviar) + "\n");
+					pw.flush();
+				}
+			}else {
+				while(!cerrar) {
+					int numEnviar = pintar();
+					System.err.println("SERVIDOR >>> Da resultado");
+					pw.write(String.valueOf(numEnviar) + "\n");
+					pw.flush();
+					turnoCliente = bfr.readLine();
+					System.err.println("Posicion cliente" + turnoCliente);
+					recibirPosicion(Integer.valueOf(turnoCliente));
+				}
+			}
+			socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		System.err.println("SERVIDOR >>> Error.");
 		}
-
 	}
 }
