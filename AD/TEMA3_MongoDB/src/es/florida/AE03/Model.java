@@ -1,4 +1,4 @@
-package AE03;
+package es.florida.AE03;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -55,18 +55,19 @@ public class Model {
 		con.coleccion1.insertOne(doc);
 	}
 	
-	public boolean login(String user, String password) {
+	public boolean login(String user, String password) throws IOException, ParseException {
+		con.conexion();
 		boolean continuar = false;
 		String pass256 = DigestUtils.sha256Hex(password);
-		String us = "", pass = "";
+		String us = null, pass = null;
 		MongoCursor<Document> cursor = con.coleccion2.find().iterator();
         while (cursor.hasNext()) {
         	JSONObject obj = new JSONObject(cursor.next().toJson());
         	us = obj.getString("user");
         	pass = obj.getString("pass");
-        }
-        if(user.equals(us) && pass256.equals(pass)) {
-        	continuar = true;
+            if(user.equals(us) && pass256.equals(pass)) {
+            	continuar = true;
+            }
         }
         return continuar;
 	}

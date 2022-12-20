@@ -1,11 +1,13 @@
-package AE03;
+package es.florida.AE03;
 
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Base64;
 
 import javax.imageio.ImageIO;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -26,6 +28,9 @@ public class Controlador {
 	}
 	
 	public void InitEventHandler() throws Exception {
+		do {
+			
+		}while(!login());
 		rellenarInfo(1);
 	}
 	
@@ -43,8 +48,7 @@ public class Controlador {
 			vista.txtEditorial.setText(campos[5]);
 			vista.txtNumP.setText(campos[6]);
 			
-			BufferedImage img = ImageIO.read(new ByteArrayInputStream(decodeToImage(campos[7])));
-			vista.lblImagen = new JLabel(new ImageIcon(img));
+			vista.lblImagen.setIcon(new ImageIcon(crearImage(campos)));
 		} catch (IOException | ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -54,6 +58,11 @@ public class Controlador {
 	public static byte[] decodeToImage(String imageString) {
 		return Base64.getDecoder().decode(imageString);
     }
+	
+	public Image crearImage(String[] campos) throws IOException {
+		byte[] b = decodeToImage(campos[7]);
+		return new ImageIcon(b).getImage().getScaledInstance(158, 158, Image.SCALE_SMOOTH);
+	}
 	
 	public static boolean login() throws Exception {
 		boolean correcte = false;
@@ -69,7 +78,7 @@ public class Controlador {
 			{
 			    String value1 = usu.getText();
 			    String value2 = pass.getText();
-			    if(model.login(value1, value2) == false) {
+			    if(!model.login(value1, value2)) {
 			    	JOptionPane.showMessageDialog(null, "Contrasenya o usuari incorrectes");
 			    }else {
 			    	correcte = true;
