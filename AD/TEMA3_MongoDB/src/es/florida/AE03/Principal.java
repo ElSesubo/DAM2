@@ -1,4 +1,4 @@
-package es.florida.AE03;
+package AE03;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -17,7 +17,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
 public class Principal {
-	public static void main(String[] args) throws IOException, ParseException {
+	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 	    
 		Model model = new Model();
