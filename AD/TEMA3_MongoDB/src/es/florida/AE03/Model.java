@@ -3,6 +3,9 @@ package es.florida.AE03;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JOptionPane;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bson.Document;
@@ -41,18 +44,51 @@ public class Model {
         return info;
 	}
 	
-	public void deleteObject(String id) {
+	public void deleteObject(int id) {
+		try {
+			con.conexion();
+		} catch (IOException | ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Bson query = Filters.eq("Id", id);
-		con.coleccion1.deleteOne(query);
+		try {
+			con.coleccion1.deleteOne(query);
+			JOptionPane.showMessageDialog(null, "Registre eliminat correctament");
+		}catch(Exception e) {
+			JOptionPane.showMessageDialog(null, "Error al eliminar el registre");
+		}
 	}
 	
-	public void updateObject(String id, Document doc) {
+	public void updateObject(int id, Document doc) {
+		try {
+			con.conexion();
+		} catch (IOException | ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Bson query = Filters.eq("Id", id);
-		con.coleccion1.updateOne(query, doc);
+		try {
+			con.coleccion1.updateOne(query, new Document("$set",doc));
+			JOptionPane.showMessageDialog(null, "Camps actualitzats correctament");
+		}catch(Exception e) {
+			JOptionPane.showMessageDialog(null, "Problema al actulitzar els camps");
+		}
 	}
 	
 	public void insertObject(Document doc) {
-		con.coleccion1.insertOne(doc);
+		try {
+			con.conexion();
+		} catch (IOException | ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			con.coleccion1.insertOne(doc);
+			JOptionPane.showMessageDialog(null, "Registre insertat correctament");
+		}catch(Exception e) {
+			JOptionPane.showMessageDialog(null, "Error al insertar el objecte");
+		}
 	}
 	
 	public boolean login(String user, String password) throws IOException, ParseException {
@@ -72,8 +108,28 @@ public class Model {
         return continuar;
 	}
 	
-
-		
-
+	public List<Libros> mostrarInfo(Bson query) throws IOException, ParseException {
+        con.conexion();
+        List<Libros> lista= new ArrayList<Libros>();
+        if(query == null) {
+            MongoCursor<Document> cursor = con.coleccion1.find().iterator();
+            while (cursor.hasNext()) {
+                JSONObject obj = new JSONObject(cursor.next().toJson());
+                int id=obj.getInt("Id");
+                String titulo=obj.getString("Titulo");
+                lista.add(new Libros(id,titulo));
+            }
+            return lista;
+        }else {
+            MongoCursor<Document> cursor = con.coleccion1.find(query).iterator();
+            while (cursor.hasNext()) {
+                JSONObject obj = new JSONObject(cursor.next().toJson());
+                int id=obj.getInt("Id");
+                String titulo=obj.getString("Titulo");
+                lista.add(new Libros(id,titulo));
+            }
+            return lista;
+        }
+    }
 
 }

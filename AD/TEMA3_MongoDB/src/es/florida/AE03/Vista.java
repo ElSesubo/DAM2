@@ -11,6 +11,7 @@ import javax.swing.JTextField;
 import java.awt.SystemColor;
 import javax.swing.JButton;
 import java.awt.Color;
+import javax.swing.JScrollPane;
 
 public class Vista extends JFrame {
 
@@ -26,6 +27,13 @@ public class Vista extends JFrame {
 	JTextField textField;
 	JTextField txtNumP;
 	JLabel lblImagen;
+	JButton btnAgregar;
+	JButton btnEditar;
+	JButton btnBorrar;
+	JButton btnSalir;
+	JButton btnActualizar;
+	JLabel lbl_numLibro;
+	JButton btnFiltrar;
 
 	/**
 	 * Launch the application.
@@ -47,17 +55,13 @@ public class Vista extends JFrame {
 
 		contentPane.setLayout(null);
 		frame.getContentPane().add(contentPane);
-		
-		table_colection = new JTable();
-		table_colection.setBounds(33, 60, 283, 363);
-		contentPane.add(table_colection);
 
 		JLabel lblNewLabel = new JLabel("Total llibres:");
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 18));
 		lblNewLabel.setBounds(33, 433, 111, 45);
 		contentPane.add(lblNewLabel);
 		
-		JLabel lbl_numLibro = new JLabel("0");
+		lbl_numLibro = new JLabel("0");
 		lbl_numLibro.setFont(new Font("Tahoma", Font.BOLD, 18));
 		lbl_numLibro.setBounds(164, 433, 66, 45);
 		contentPane.add(lbl_numLibro);
@@ -95,6 +99,7 @@ public class Vista extends JFrame {
 		panel.add(lblNewLabel_1_2_1);
 		
 		txtEditorial = new JTextField();
+		txtEditorial.setEditable(false);
 		txtEditorial.setFont(new Font("Tahoma", Font.BOLD, 14));
 		txtEditorial.setColumns(10);
 		txtEditorial.setBounds(86, 204, 229, 28);
@@ -111,12 +116,14 @@ public class Vista extends JFrame {
 		panel.add(lblNewLabel_1_3);
 		
 		txtFechaP = new JTextField();
+		txtFechaP.setEditable(false);
 		txtFechaP.setFont(new Font("Tahoma", Font.BOLD, 14));
 		txtFechaP.setColumns(10);
 		txtFechaP.setBounds(173, 166, 142, 28);
 		panel.add(txtFechaP);
 		
 		txtFechaN = new JTextField();
+		txtFechaN.setEditable(false);
 		txtFechaN.setFont(new Font("Tahoma", Font.BOLD, 14));
 		txtFechaN.setColumns(10);
 		txtFechaN.setBounds(173, 127, 142, 28);
@@ -133,12 +140,14 @@ public class Vista extends JFrame {
 		panel.add(lblNewLabel_1_1);
 		
 		txtAutor = new JTextField();
+		txtAutor.setEditable(false);
 		txtAutor.setFont(new Font("Tahoma", Font.BOLD, 14));
 		txtAutor.setColumns(10);
 		txtAutor.setBounds(86, 89, 229, 28);
 		panel.add(txtAutor);
 		
 		txtNombre = new JTextField();
+		txtNombre.setEditable(false);
 		txtNombre.setFont(new Font("Tahoma", Font.BOLD, 14));
 		txtNombre.setColumns(10);
 		txtNombre.setBounds(86, 50, 229, 28);
@@ -155,36 +164,55 @@ public class Vista extends JFrame {
 		panel.add(lblNewLabel_1_5);
 		
 		txtID = new JTextField();
+		txtID.setEditable(false);
 		txtID.setFont(new Font("Tahoma", Font.BOLD, 14));
 		txtID.setColumns(10);
 		txtID.setBounds(86, 12, 229, 28);
 		panel.add(txtID);
 		
 		txtNumP = new JTextField();
+		txtNumP.setEditable(false);
 		txtNumP.setFont(new Font("Tahoma", Font.BOLD, 14));
 		txtNumP.setColumns(10);
 		txtNumP.setBounds(173, 240, 142, 28);
 		panel.add(txtNumP);
 		
-		JButton btnAgregar = new JButton("Agregar");
+		btnAgregar = new JButton("Agregar");
 		btnAgregar.setBackground(Color.LIGHT_GRAY);
 		btnAgregar.setBounds(726, 60, 129, 45);
 		contentPane.add(btnAgregar);
 		
-		JButton btnEditar = new JButton("Editar");
+		btnEditar = new JButton("Editar");
 		btnEditar.setBackground(Color.LIGHT_GRAY);
 		btnEditar.setBounds(726, 116, 129, 45);
 		contentPane.add(btnEditar);
 		
-		JButton btnBorrar = new JButton("Esborrar");
+		btnBorrar = new JButton("Esborrar");
 		btnBorrar.setBackground(Color.LIGHT_GRAY);
 		btnBorrar.setBounds(726, 172, 129, 45);
 		contentPane.add(btnBorrar);
 		
-		JButton btnSalir = new JButton("Eixir");
+		btnSalir = new JButton("Eixir");
 		btnSalir.setBackground(Color.LIGHT_GRAY);
 		btnSalir.setBounds(726, 499, 129, 45);
 		contentPane.add(btnSalir);
+		
+		btnActualizar = new JButton("Actulitzar");
+		btnActualizar.setBackground(Color.LIGHT_GRAY);
+		btnActualizar.setBounds(726, 447, 129, 45);
+		contentPane.add(btnActualizar);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(33, 60, 283, 363);
+		contentPane.add(scrollPane);
+		
+		table_colection = new JTable();
+		scrollPane.setViewportView(table_colection);
+		
+		btnFiltrar = new JButton("Filtrar");
+		btnFiltrar.setBackground(Color.LIGHT_GRAY);
+		btnFiltrar.setBounds(726, 255, 129, 45);
+		contentPane.add(btnFiltrar);
 
 		this.frame.setVisible(true);
 	}
