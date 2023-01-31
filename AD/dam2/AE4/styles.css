@@ -1,0 +1,150 @@
+body {
+    color: #000;
+    box-sizing: border-box;
+    background-image: url("img_01_01.jpg");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: 100% 100%;
+    padding: 20px;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  h1 {
+    font-size: 6em;
+    font-weight: bolder;
+  }
+
+  main {
+    width: 90%;
+    padding: 20px 0 0;
+    margin: 0 auto;
+    align-items: center;
+  }
+  
+  main div {
+    margin: 0 auto;
+    font-weight: 500;
+    text-align: center;
+    line-height: 65px;
+    width: 175px;
+    height: 160px;
+    display: inline-block;
+    background-color: #95724e;
+    border-radius: 0;
+    margin: 2em;
+    transition: all 300ms ease-in-out;
+    border-radius: 8px;
+    border-width: 5px;
+    border-color: #221b11;
+    border-style: solid;
+    font-size: 13px;
+    letter-spacing: -1px;
+    font-family: Poppins;
+    color: #221b11;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  main div:hover{
+    background-color: #221b11;
+    border-color: #95724e;
+    color: #95724e;
+    cursor: pointer;
+  }
+
+  main div img{
+    margin-top: 20px;
+    width: 45px;
+  }
+
+  .title {
+    text-align: center;
+  }
+
+  .title img{
+    margin-top: 50px;
+    width: 550px;
+  }
+
+  .caja{
+    border-style: solid;
+    border-width: 5px;
+    border-color: #221b11;
+    width: 70%;
+    height: 93vh;
+    background-color: #95724e;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .imagen{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
+  .imagen img{
+    width: 400px;
+    border-style: solid;
+    border-width: 5px;
+    border-radius: 8px;
+    background-image: radial-gradient(white, #EDEECB, #F0ECC1);
+    border-color: #221b11;
+  }
+  
+  .titulo{
+    align-self: center;
+    font-family: Poppins;
+    color: #F0ECC1;
+  }
+
+  .info_rec{
+    font-family: Poppins;
+    color: #F0ECC1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-right: 100px;
+  }
+
+  .info button{
+    margin-top: 50px; 
+    font-family: Poppins;
+    border-radius: 10px;
+    background-color: white;
+    border: none;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    color: black;
+    border: 2px solid #555555;
+    transition: all 300ms ease-in-out;
+  }
+
+  .info button:hover{
+    background-color: lightgrey;
+    cursor: pointer;
+  }
+
+  #id{
+    display: none;
+  }
+
+  #name{
+    display: none;
+  }
+
+  @font-face {
+    font-family: Poppins;
+    src: url(./fonts/Poppins-Medium.ttf);
+  }
+
+  @font-face {
+    font-family: Monster_Hunter;
+    src: url(./fonts/MonsterHunter.ttf);
+  }
+  

@@ -1,0 +1,1 @@
+Buenas roberto, te adjunto la consulta sql de la base de datos aquí, por cierto dentro de la carpeta de AE4 hay un json, eso ni caso, solamente es de referencia
